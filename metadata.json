@@ -1,0 +1,6 @@
+{
+  "name": "Barsha",
+  "description": "Barsha is a premium, highly intellectual AI-powered academic and search companion. Seamlessly analyze study papers, syllabus guidelines, complex coding challenges, and historical world literature with maximum speed.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
