@@ -8,8 +8,6 @@ interface SidebarProps {
   onSelectSession: (id: string) => void;
   onDeleteSession: (id: string) => void;
   onNewChat: () => void;
-  currentModel: string;
-  onChangeModel: (model: string) => void;
   themePreset: 'rose' | 'tulip' | 'dandelion';
   onChangeThemePreset: (preset: 'rose' | 'tulip' | 'dandelion') => void;
   themeMode: 'light' | 'dark';
@@ -27,8 +25,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectSession,
   onDeleteSession,
   onNewChat,
-  currentModel,
-  onChangeModel,
   themePreset,
   onChangeThemePreset,
   themeMode,
@@ -133,27 +129,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
           )}
-        </div>
-
-        {/* Model Selection Block */}
-        <div className="px-4 py-2 border-b border-slate-100/70">
-          <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5 pl-1">
-            Engine Model
-          </label>
-          <div className="relative">
-            <select
-              value={currentModel}
-              onChange={(e) => onChangeModel(e.target.value)}
-              id="model-selector-select"
-              className="w-full appearance-none bg-slate-50 border border-slate-200 hover:border-slate-300 text-xs text-slate-700 py-2.5 px-3 pr-8 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400/80 focus:border-sky-400/80 cursor-pointer transition-all font-medium"
-            >
-              <option value="gemini-3.5-flash">⚡ Barsha Speed-Optimized Core</option>
-              <option value="gemini-3.1-pro-preview">💎 Barsha Pro Deep-Reasoning Core</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-500">
-              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-            </div>
-          </div>
         </div>
 
         {/* Chat History Section */}

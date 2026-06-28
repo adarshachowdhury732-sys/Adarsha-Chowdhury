@@ -6,12 +6,16 @@ interface ChatInputProps {
   onSendMessage: (content: string, attachments: Attachment[]) => void;
   isGenerating: boolean;
   themePreset: 'rose' | 'tulip' | 'dandelion';
+  currentModel: string;
+  onChangeModel: (model: string) => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
   onSendMessage,
   isGenerating,
   themePreset,
+  currentModel,
+  onChangeModel,
 }) => {
   const [inputText, setInputText] = useState('');
   const [stagedFiles, setStagedFiles] = useState<Attachment[]>([]);
@@ -64,6 +68,19 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
       recognitionRef.current = rec;
     }
+  }, []);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const container = document.getElementById('model-selector-container');
+      const dropdown = document.getElementById('model-dropdown');
+      if (container && !container.contains(event.target as Node) && dropdown) {
+        dropdown.classList.add('hidden');
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleToggleVoice = () => {
@@ -258,26 +275,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         )}
 
         {/* 2. Text Input area */}
-        <div className="flex items-end gap-2 px-4 py-3">
-          {/* Attachment trigger */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            id="attachment-trigger-btn"
-            className="p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-50 active:scale-95 transition-all flex-shrink-0 cursor-pointer"
-            title="Attach images, PDFs, text"
-          >
-            <Paperclip className="w-5 h-5" />
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            onChange={handleFileInputChange}
-            id="hidden-file-selector"
-            className="hidden"
-            accept="image/*,application/pdf,text/*,.js,.ts,.tsx,.py,.json,.csv"
-          />
-
+        <div className="flex flex-col px-4 py-3">
           {/* Core Text Box */}
           <textarea
             ref={textareaRef}
@@ -286,40 +284,129 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask Barsha about pyqs, coding, literature..."
-            className="flex-1 resize-none bg-transparent border-0 py-1.5 focus:ring-0 text-slate-700 text-sm md:text-base placeholder-slate-400 max-h-[180px] focus:outline-none min-h-[24px]"
+            className="w-full resize-none bg-transparent border-0 py-1.5 mb-2 focus:ring-0 text-slate-700 text-sm md:text-base placeholder-slate-400 max-h-[180px] focus:outline-none min-h-[24px]"
           />
 
-          {/* Native microphone trigger */}
-          <button
-            onClick={handleToggleVoice}
-            id="voice-dictation-btn"
-            className={`p-2 rounded-full active:scale-95 transition-all flex-shrink-0 cursor-pointer ${
-              isListening
-                ? 'bg-rose-500 text-white animate-pulse'
-                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-            }`}
-            title={isListening ? "Listening... click to stop" : "Dictate prompt"}
-          >
-            {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              {/* Custom Model Selector */}
+              <div className="relative" id="model-selector-container">
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('model-dropdown');
+                    if (el) el.classList.toggle('hidden');
+                  }}
+                  className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 hover:border-slate-300 text-xs text-slate-600 py-1.5 px-3 rounded-lg focus:outline-none transition-all font-semibold mr-1 cursor-pointer"
+                >
+                  {currentModel === 'gemini-1.5-flash' ? 'Barsha Spark' : 
+                   currentModel === 'gemini-2.5-flash' ? 'Barsha Spark 2.5' : 
+                   'Barsha Pro'}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* Dropdown Menu */}
+                <div 
+                  id="model-dropdown" 
+                  className="hidden absolute bottom-full left-0 mb-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200/60 overflow-hidden z-50 origin-bottom-left"
+                >
+                  <div className="p-1">
+                    <button
+                      onClick={() => {
+                        onChangeModel('gemini-2.5-flash');
+                        document.getElementById('model-dropdown')?.classList.add('hidden');
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer ${currentModel === 'gemini-2.5-flash' ? 'bg-sky-50' : ''}`}
+                    >
+                      <div className="font-semibold text-sm text-slate-700 flex justify-between items-center">
+                        Barsha Spark 2.5
+                        {currentModel === 'gemini-2.5-flash' && <div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>}
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">Fastest model for everyday tasks and casual searches</div>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onChangeModel('gemini-1.5-flash');
+                        document.getElementById('model-dropdown')?.classList.add('hidden');
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer ${currentModel === 'gemini-1.5-flash' ? 'bg-sky-50' : ''}`}
+                    >
+                      <div className="font-semibold text-sm text-slate-700 flex justify-between items-center">
+                        Barsha Spark
+                        {currentModel === 'gemini-1.5-flash' && <div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>}
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">Fast, efficient, and reliable for standard queries</div>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onChangeModel('gemini-3.1-pro-preview');
+                        document.getElementById('model-dropdown')?.classList.add('hidden');
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer ${currentModel === 'gemini-3.1-pro-preview' ? 'bg-sky-50' : ''}`}
+                    >
+                      <div className="font-semibold text-sm text-slate-700 flex justify-between items-center">
+                        Barsha Pro
+                        {currentModel === 'gemini-3.1-pro-preview' && <div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>}
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">Advanced reasoning for complex academic analysis</div>
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-          {/* Send Action */}
-          <button
-            onClick={handleSend}
-            id="send-message-btn"
-            disabled={isGenerating || (!inputText.trim() && stagedFiles.length === 0)}
-            className={`p-3 rounded-2xl flex-shrink-0 transition-all cursor-pointer ${
-              isGenerating || (!inputText.trim() && stagedFiles.length === 0)
-                ? 'bg-slate-100 text-slate-300 pointer-events-none'
-                : themePreset === 'rose'
-                ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-200 active:scale-95'
-                : themePreset === 'tulip'
-                ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-200 active:scale-95'
-                : 'bg-sky-500 hover:bg-sky-600 text-white shadow-lg shadow-sky-200 active:scale-95'
-            }`}
-          >
-            <Send className="w-4.5 h-4.5" />
-          </button>
+              {/* Attachment trigger */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                id="attachment-trigger-btn"
+                className="p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-50 active:scale-95 transition-all flex-shrink-0 cursor-pointer"
+                title="Attach images, PDFs, text"
+              >
+                <Paperclip className="w-4.5 h-4.5" />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                onChange={handleFileInputChange}
+                id="hidden-file-selector"
+                className="hidden"
+                accept="image/*,application/pdf,text/*,.js,.ts,.tsx,.py,.json,.csv"
+              />
+
+              {/* Native microphone trigger */}
+              <button
+                onClick={handleToggleVoice}
+                id="voice-dictation-btn"
+                className={`p-2 rounded-full active:scale-95 transition-all flex-shrink-0 cursor-pointer ${
+                  isListening
+                    ? 'bg-rose-500 text-white animate-pulse'
+                    : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                }`}
+                title={isListening ? "Listening... click to stop" : "Dictate prompt"}
+              >
+                {isListening ? <MicOff className="w-4.5 h-4.5" /> : <Mic className="w-4.5 h-4.5" />}
+              </button>
+            </div>
+
+            {/* Send Action */}
+            <button
+              onClick={handleSend}
+              id="send-message-btn"
+              disabled={isGenerating || (!inputText.trim() && stagedFiles.length === 0)}
+              className={`p-2.5 rounded-2xl flex-shrink-0 transition-all cursor-pointer ${
+                isGenerating || (!inputText.trim() && stagedFiles.length === 0)
+                  ? 'bg-slate-100 text-slate-300 pointer-events-none'
+                  : themePreset === 'rose'
+                  ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-md shadow-rose-200 active:scale-95'
+                  : themePreset === 'tulip'
+                  ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-200 active:scale-95'
+                  : 'bg-sky-500 hover:bg-sky-600 text-white shadow-md shadow-sky-200 active:scale-95'
+              }`}
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

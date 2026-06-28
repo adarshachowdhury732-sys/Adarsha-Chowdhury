@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   GraduationCap, 
   BookOpen, 
@@ -11,7 +12,8 @@ import {
   Sparkles,
   ArrowDown,
   Compass,
-  AlertCircle
+  AlertCircle,
+  Smile
 } from 'lucide-react';
 import { ChatSession, Message, Attachment } from '../types';
 import { MarkdownRenderer } from './MarkdownRenderer';
@@ -24,8 +26,8 @@ interface ChatAreaProps {
   onSendPreset: (prompt: string) => void;
   onSendMessage: (content: string, attachments: Attachment[]) => void;
   themePreset: 'rose' | 'tulip' | 'dandelion';
-  appMode: 'study' | 'search';
-  onAppModeChange: (mode: 'study' | 'search') => void;
+  appMode: 'study' | 'search' | 'sarcasm';
+  onAppModeChange: (mode: 'study' | 'search' | 'sarcasm') => void;
 }
 
 const PRESET_PROMPTS = [
@@ -161,7 +163,9 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto font-medium">
                   {appMode === 'study' 
                     ? 'Study Mode Active — detailed academic answers & syllabus tracking'
-                    : 'Search Mode Active — concise, direct & rapid answers'
+                    : appMode === 'search'
+                      ? 'Search Mode Active — concise, direct & rapid answers'
+                      : 'Sarcasm Mode Active — sassy & sassy replies'
                   }
                 </p>
               </div>
@@ -169,7 +173,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
 
             {/* Dynamic Mode Switcher Pill */}
             <div className="flex justify-center mb-8">
-              <div className="inline-flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm">
+              <div className="inline-flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm flex-wrap justify-center">
                 <button
                   onClick={() => onAppModeChange('study')}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
@@ -191,6 +195,17 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 >
                   <Sparkles className="w-4 h-4" />
                   Search Mode
+                </button>
+                <button
+                  onClick={() => onAppModeChange('sarcasm')}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    appMode === 'sarcasm'
+                      ? 'bg-white dark:bg-slate-700 text-pink-600 dark:text-pink-300 shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+                >
+                  <Smile className="w-4 h-4" />
+                  Sarcasm Mode
                 </button>
               </div>
             </div>
@@ -224,14 +239,18 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
               </div>
             </div>
 
-            {session.messages.map((message) => {
-              const isUser = message.role === 'user';
+            <AnimatePresence initial={false}>
+              {session.messages.map((message) => {
+                const isUser = message.role === 'user';
 
-              return (
-                <div
-                  key={message.id}
-                  className={`flex gap-3 md:gap-4 ${isUser ? 'justify-end' : 'justify-start'} message-print-block`}
-                >
+                return (
+                  <motion.div
+                    key={message.id}
+                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
+                    className={`flex gap-3 md:gap-4 ${isUser ? 'justify-end' : 'justify-start'} message-print-block`}
+                  >
                   {/* Left Avatar (only for Assistant) */}
                   {!isUser && (
                     <div className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center bg-gradient-to-tr from-purple-600 to-indigo-600 text-white border border-purple-500/20 shadow-3xs">
@@ -330,9 +349,10 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                       </div>
                     )}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
+            </AnimatePresence>
 
             {/* Inline Loading / Generation Indicator */}
             {isGenerating && (

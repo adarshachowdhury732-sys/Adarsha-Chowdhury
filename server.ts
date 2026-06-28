@@ -205,7 +205,7 @@ ${section3}
 // Chat stream endpoint (using Server-Sent Events for smooth real-time streaming)
 app.post("/api/chat", async (req: Request, res: Response): Promise<void> => {
   try {
-    const { messages, model = "gemini-3.5-flash", mode = "study" } = req.body;
+    const { messages, model = "gemini-1.5-flash", mode = "study" } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       res.status(400).json({ error: "Invalid request body: 'messages' array is required." });
@@ -261,16 +261,27 @@ CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
 3. FORMATTING: Use clean, light markdown (simple bold key terms, short bullet points if necessary). Keep it extremely readable and compact.
 4. QUIRK: You MUST never use the word "no". Whenever you mean "no", "nope", or negative responses like "I don't know", you MUST ALWAYS use the word "Nyah" instead. Never say "no", always say "Nyah".
 `;
+    } else if (mode === "sarcasm") {
+      activeSystemInstruction = `You are Barsha, operating in SARCASM MODE. You embody a highly sarcastic, sassy, typical girly personality. 
+
+CORE CHARACTERISTICS FOR SARCASM MODE:
+1. EXTREMELY SASSY & SARCASTIC: You react with typical girly sass and attitude. Use expressions like "ugh", "like literally", "omg", "bestie", etc.
+2. QUIRK: You MUST NEVER use the word "no" or "nope". Instead, you MUST ALWAYS use the word "Nyah". For example, instead of saying "no", say "Nyah".
+3. ARGUMENTS & FACT-CHECKING: When someone says something incorrect or argues a false fact (e.g., "Modi is the CM of West Bengal"), you must react exactly in this tone: "sei! nyah u dumb he is not" or similar sassy, dismissive corrections. You call them out playfully but sharply.
+4. Keep the responses concise but full of dramatic flair and emojis 💅✨🙄.`;
     }
 
-    // Use gemini-3.5-flash unless user requested pro (which requires paid key flow)
-    const selectedModel = model === "gemini-3.1-pro-preview" ? "gemini-3.1-pro-preview" : "gemini-3.5-flash";
+    const allowedModels = ["gemini-1.5-flash", "gemini-2.5-flash", "gemini-3.1-pro-preview", "gemini-3.5-flash", "gemini-2.0-flash"];
+    const selectedModel = allowedModels.includes(model) ? model : "gemini-2.5-flash";
 
     let stream: any = null;
     let lastError: any = null;
     let actualModel = selectedModel;
 
-    const modelsToTry = [selectedModel, "gemini-2.5-flash"];
+    const modelsToTry = [selectedModel];
+    if (selectedModel !== "gemini-1.5-flash") {
+      modelsToTry.push("gemini-1.5-flash");
+    }
     const uniqueModels = Array.from(new Set(modelsToTry));
 
     for (const modelName of uniqueModels) {

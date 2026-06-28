@@ -24,10 +24,10 @@ export default function App() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [currentModel, setCurrentModel] = useState<string>('gemini-3.5-flash');
+  const [currentModel, setCurrentModel] = useState<string>('gemini-1.5-flash');
   const [themePreset, setThemePreset] = useState<'rose' | 'tulip' | 'dandelion'>('dandelion');
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
-  const [appMode, setAppMode] = useState<'study' | 'search'>('study');
+  const [appMode, setAppMode] = useState<'study' | 'search' | 'sarcasm'>('study');
   const [isStandalone, setIsStandalone] = useState(false);
   
   // --- View modes & update states ---
@@ -188,8 +188,8 @@ export default function App() {
       }
 
       const savedAppMode = localStorage.getItem('barsha_app_mode');
-      if (savedAppMode === 'study' || savedAppMode === 'search') {
-        setAppMode(savedAppMode as 'study' | 'search');
+      if (savedAppMode === 'study' || savedAppMode === 'search' || savedAppMode === 'sarcasm') {
+        setAppMode(savedAppMode as 'study' | 'search' | 'sarcasm');
       }
     } catch (e) {
       console.error("Error reading from localstorage", e);
@@ -227,8 +227,8 @@ export default function App() {
     localStorage.setItem('barsha_model_engine', model);
   };
 
-  // Change app mode (study vs normal search)
-  const handleAppModeChange = (mode: 'study' | 'search') => {
+  // Change app mode (study vs normal search vs sarcasm)
+  const handleAppModeChange = (mode: 'study' | 'search' | 'sarcasm') => {
     setAppMode(mode);
     localStorage.setItem('barsha_app_mode', mode);
   };
@@ -512,8 +512,6 @@ export default function App() {
             onSelectSession={handleSelectSession}
             onDeleteSession={handleDeleteSession}
             onNewChat={handleNewChat}
-            currentModel={currentModel}
-            onChangeModel={handleModelChange}
             themePreset={themePreset}
             onChangeThemePreset={handleThemeChange}
             themeMode={themeMode}
@@ -617,6 +615,8 @@ export default function App() {
                     onSendMessage={handleSendMessage}
                     isGenerating={isGenerating}
                     themePreset={themePreset}
+                    currentModel={currentModel}
+                    onChangeModel={handleModelChange}
                   />
                 </div>
               </>
