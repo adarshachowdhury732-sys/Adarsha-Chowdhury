@@ -33,7 +33,7 @@ export const OfficialLanding: React.FC<OfficialLandingProps> = ({ onOpenWorkspac
   };
 
   return (
-    <div className="min-h-screen bg-[#070214] text-slate-100 font-sans selection:bg-purple-500/30 overflow-x-hidden relative">
+    <div className="min-h-screen bg-transparent text-slate-100 font-sans selection:bg-purple-500/30 overflow-x-hidden relative">
       {/* Absolute Celestial Background Graphics */}
       <div className="absolute top-0 left-0 right-0 h-[600px] bg-gradient-to-b from-purple-950/20 via-indigo-950/10 to-transparent pointer-events-none" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none animate-pulse" style={{ animationDuration: '10s' }} />
@@ -58,19 +58,13 @@ export const OfficialLanding: React.FC<OfficialLandingProps> = ({ onOpenWorkspac
       </div>
 
       {/* Header / Navigation Bar */}
-      <header className="relative max-w-7xl mx-auto px-6 py-6 flex items-center justify-between border-b border-purple-500/10 z-10">
+      <header className="relative max-w-7xl mx-auto px-6 py-6 flex items-center justify-between border-b border-slate-200/10 z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20 border border-purple-400/20">
-            <Sparkles className="w-5.5 h-5.5 text-white" />
-          </div>
-          <div>
-            <span className="text-lg font-black tracking-wider bg-gradient-to-r from-white via-purple-200 to-amber-200 bg-clip-text text-transparent font-display">
-              BARSHA AI
-            </span>
-            <span className="block text-[8px] text-purple-400 font-bold uppercase tracking-widest leading-none">
-              Academic Intelligence
-            </span>
-          </div>
+          <img src="/flower-logo.png" alt="Barsha Logo" className="w-8 h-8 object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.6)]" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden') }} />
+          <Sparkles className="w-6 h-6 text-white hidden" />
+          <span className="font-bold text-xl text-white tracking-tight lowercase">
+            barsha
+          </span>
         </div>
 
         <div className="flex items-center gap-4">

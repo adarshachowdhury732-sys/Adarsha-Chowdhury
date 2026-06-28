@@ -131,7 +131,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   const hasMessages = session && session.messages.length > 0;
 
   return (
-    <div className="relative flex-1 flex flex-col min-w-0 min-h-0 bg-white/45 select-text">
+    <div className="relative flex-1 flex flex-col min-w-0 min-h-0 bg-white/45 dark:bg-transparent select-text">
       {/* Scrollable Container */}
       <div
         ref={scrollRef}
@@ -150,15 +150,16 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
             {/* Main Branding Card */}
             <div className="text-center space-y-4 mb-8">
               <div className="inline-flex items-center justify-center relative">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20 relative z-10 transition-all duration-300 border border-purple-400/20">
-                  <Sparkles className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20 relative z-10 transition-all duration-300 border border-purple-400/20 dark:from-slate-800 dark:to-slate-700">
+                  <img src="/flower-logo.png" alt="Barsha Logo" className="w-12 h-12 object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden') }} />
+                  <Sparkles className="w-8 h-8 text-white hidden" />
                 </div>
                 <div className="absolute inset-0 bg-purple-500/10 rounded-2xl blur-md scale-115 animate-pulse" />
               </div>
 
               <div className="space-y-2">
-                <h2 className="text-3xl md:text-4.5xl font-extrabold font-display tracking-tight text-slate-800 dark:text-white">
-                  BARSHA
+                <h2 className="text-3xl md:text-4.5xl font-extrabold font-display tracking-tight text-slate-800 dark:text-white lowercase">
+                  barsha
                 </h2>
                 <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto font-medium">
                   {appMode === 'study' 
@@ -268,10 +269,10 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                         {message.attachments.map((file) => (
                           <div
                             key={file.id}
-                            className="flex items-center gap-2 bg-slate-50 border border-slate-200/80 rounded-xl py-1.5 px-3 shadow-4xs select-none max-w-xs"
+                            className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl py-1.5 px-3 shadow-4xs select-none max-w-xs"
                           >
                             {file.type === 'image' ? (
-                              <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-slate-200/50 flex-shrink-0 bg-slate-200">
+                              <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-slate-200/50 dark:border-slate-700 flex-shrink-0 bg-slate-200 dark:bg-slate-800">
                                 <img
                                   src={file.data}
                                   alt={file.name}
@@ -280,12 +281,12 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                                 />
                               </div>
                             ) : (
-                              <div className="w-8 h-8 rounded-lg bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-500 flex-shrink-0">
+                              <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900/30 border border-sky-100 dark:border-sky-800/50 flex items-center justify-center text-sky-500 dark:text-sky-400 flex-shrink-0">
                                 <FileText className="w-4.5 h-4.5" />
                               </div>
                             )}
                             <div className="min-w-0 pr-1">
-                              <p className="text-xs font-semibold text-slate-700 truncate max-w-[120px]">{file.name}</p>
+                              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[120px]">{file.name}</p>
                               <p className="text-[9px] text-slate-400 font-medium">
                                 {file.type.toUpperCase()}
                               </p>
@@ -298,8 +299,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                     {/* Speech / Text Bubble */}
                     <div className={`leading-relaxed w-full ${
                       isUser
-                        ? 'rounded-2xl px-4 py-3 md:py-3.5 shadow-4xs bg-sky-500 text-white rounded-br-none font-medium text-sm md:text-base border border-sky-400/20'
-                        : 'text-slate-800 text-sm md:text-base'
+                        ? 'rounded-2xl px-4 py-3 md:py-3.5 shadow-4xs bg-sky-500 text-white rounded-br-none font-medium text-sm md:text-base border border-sky-400/20 dark:bg-sky-600/80'
+                        : 'text-slate-800 dark:text-slate-200 text-sm md:text-base'
                     }`}>
                       {isUser ? (
                         <p className="whitespace-pre-wrap break-words">{message.content}</p>
@@ -320,7 +321,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                               key={idx}
                               onClick={() => onSendPreset(suggestion)}
                               id={`insight-suggestion-${idx}`}
-                              className="text-left text-xs bg-sky-50/50 hover:bg-sky-100/85 text-sky-700 border border-sky-100/80 py-2 px-3 rounded-xl transition-all cursor-pointer hover:border-sky-300 active:scale-98"
+                              className="text-left text-xs bg-sky-50/50 dark:bg-sky-900/30 hover:bg-sky-100/85 dark:hover:bg-sky-800/80 text-sky-700 dark:text-sky-300 border border-sky-100/80 dark:border-sky-800/50 py-2 px-3 rounded-xl transition-all cursor-pointer hover:border-sky-300 dark:hover:border-sky-600 active:scale-98"
                             >
                               {suggestion}
                             </button>

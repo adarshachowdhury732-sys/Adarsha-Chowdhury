@@ -210,8 +210,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`relative rounded-[28px] border border-sky-100/80 bg-white shadow-xl shadow-sky-900/5 transition-all duration-200 ${
-          isDragOver ? 'ring-2 ring-sky-400/80 border-transparent bg-sky-50/10' : ''
+        className={`relative rounded-[28px] border border-slate-200/50 dark:border-slate-800/80 bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-md shadow-xl shadow-slate-200/20 dark:shadow-none transition-all duration-200 ${
+          isDragOver ? 'ring-2 ring-sky-400/80 border-transparent bg-sky-50/10 dark:bg-sky-900/20' : ''
         }`}
       >
         {/* Error Notification Toast (In-Bar for clean non-intrusive layout) */}
@@ -233,31 +233,31 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
         {/* 1. Staged Files Thumbnail Shelf */}
         {stagedFiles.length > 0 && (
-          <div className="flex flex-wrap gap-2 px-4 pt-3 border-b border-slate-100 select-none pb-2">
+          <div className="flex flex-wrap gap-2 px-4 pt-3 border-b border-slate-100 dark:border-slate-800/50 select-none pb-2">
             {stagedFiles.map((file) => (
               <div
                 key={file.id}
-                className="group relative flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-1.5 pr-2"
+                className="group relative flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-1.5 pr-2"
               >
                 {file.type === 'image' ? (
-                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-200 flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-200 dark:bg-slate-800 flex-shrink-0">
                     <img src={file.data} alt="Upload preview" className="w-full h-full object-cover" />
                   </div>
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-500 flex-shrink-0">
-                    <span className="text-[10px] font-bold text-sky-700">
+                  <div className="w-10 h-10 rounded-lg bg-sky-50 dark:bg-sky-900/30 border border-sky-100 dark:border-sky-800/50 flex items-center justify-center text-sky-500 dark:text-sky-400 flex-shrink-0">
+                    <span className="text-[10px] font-bold text-sky-700 dark:text-sky-300">
                       {file.type.toUpperCase()}
                     </span>
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold text-slate-700 truncate max-w-[100px]">{file.name}</p>
+                  <p className="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate max-w-[100px]">{file.name}</p>
                   <p className="text-[8px] text-slate-400 font-medium">Staged</p>
                 </div>
                 <button
                   onClick={() => handleRemoveStagedFile(file.id)}
                   id={`remove-staged-file-${file.id}`}
-                  className="p-0.5 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 active:scale-90 transition-all cursor-pointer"
+                  className="p-0.5 rounded-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 active:scale-90 transition-all cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -266,7 +266,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             <button
               onClick={() => setStagedFiles([])}
               id="clear-all-staged-btn"
-              className="flex items-center gap-1 hover:text-red-500 text-slate-400 text-[10px] font-semibold py-1 px-2 rounded-lg hover:bg-red-50 hover:border-red-100 border border-transparent transition-all cursor-pointer"
+              className="flex items-center gap-1 hover:text-red-500 text-slate-400 text-[10px] font-semibold py-1 px-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-100 dark:hover:border-red-900/30 border border-transparent transition-all cursor-pointer"
             >
               <Trash2 className="w-3 h-3" />
               <span>Clear Staged</span>
@@ -284,7 +284,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask Barsha about pyqs, coding, literature..."
-            className="w-full resize-none bg-transparent border-0 py-1.5 mb-2 focus:ring-0 text-slate-700 text-sm md:text-base placeholder-slate-400 max-h-[180px] focus:outline-none min-h-[24px]"
+            className="w-full resize-none bg-transparent border-0 py-1.5 mb-2 focus:ring-0 text-slate-700 dark:text-slate-100 text-sm md:text-base placeholder-slate-400 dark:placeholder-slate-500 max-h-[180px] focus:outline-none min-h-[24px]"
           />
 
           <div className="flex items-center justify-between">
@@ -296,7 +296,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                     const el = document.getElementById('model-dropdown');
                     if (el) el.classList.toggle('hidden');
                   }}
-                  className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 hover:border-slate-300 text-xs text-slate-600 py-1.5 px-3 rounded-lg focus:outline-none transition-all font-semibold mr-1 cursor-pointer"
+                  className="flex items-center gap-1.5 bg-slate-50 dark:bg-[#010101] border border-slate-200 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 text-xs text-slate-600 dark:text-slate-300 py-1.5 px-3 rounded-lg focus:outline-none transition-all font-semibold mr-1 cursor-pointer"
                 >
                   {currentModel === 'gemini-2.5-flash' ? 'Barsha Spark 2.5' : 
                    'Barsha Pro 2.5'}

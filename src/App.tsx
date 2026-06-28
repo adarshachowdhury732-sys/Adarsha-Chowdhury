@@ -5,6 +5,7 @@ import { ChatArea } from './components/ChatArea';
 import { ChatInput } from './components/ChatInput';
 import { InstallHub } from './components/InstallHub';
 import { OfficialLanding } from './components/OfficialLanding';
+import { ParticlesBackground } from './components/ParticlesBackground';
 import { ChatSession, Message, Attachment } from './types';
 import { parseBarshaResponse } from './utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -257,6 +258,14 @@ export default function App() {
     }
   };
 
+  const handleClearAllChats = () => {
+    if (window.confirm('Are you sure you want to delete all chats? This cannot be undone.')) {
+      setSessions([]);
+      syncSessionsToStorage([]);
+      setActiveSessionId(null);
+    }
+  };
+
   // Reset / Start a fresh workspace
   const handleNewChat = () => {
     setActiveSessionId(null);
@@ -474,43 +483,46 @@ export default function App() {
   const currentActiveSession = sessions.find((s) => s.id === activeSessionId) || null;
 
   return (
-    <AnimatePresence mode="wait">
-      {showSplash ? (
-        <motion.div
-          key="splash-screen"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className={`fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden select-none transition-colors duration-300 ${themeMode === 'dark' ? 'bg-[#070214]' : 'bg-[#fafcff]'}`}
-        >
+    <>
+      {(themeMode === 'dark' || viewMode === 'landing') && <ParticlesBackground />}
+      <AnimatePresence mode="wait">
+        {showSplash ? (
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: [0.8, 1.1, 1], opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className={`w-16 h-16 rounded-2xl flex items-center justify-center ${themeMode === 'dark' ? 'bg-white text-black' : 'bg-black text-white'}`}
+            key="splash-screen"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className={`fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden select-none transition-colors duration-300 ${themeMode === 'dark' ? 'bg-[#010101]' : 'bg-[#fafcff]'}`}
           >
-            <Sparkles className="w-8 h-8" />
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: [0.8, 1.1, 1], opacity: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className={`w-16 h-16 rounded-2xl flex items-center justify-center ${themeMode === 'dark' ? 'bg-white text-black' : 'bg-black text-white'}`}
+            >
+              <Sparkles className="w-8 h-8" />
+            </motion.div>
           </motion.div>
-        </motion.div>
-      ) : viewMode === 'landing' ? (
-        <OfficialLanding
-          onOpenWorkspace={() => setViewMode('chat')}
-          sharedUrl={getCleanSharedUrl()}
-        />
-      ) : (
-        <motion.div
-          key="main-app"
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className={`flex h-[100dvh] w-[100dvw] overflow-hidden overscroll-none transition-colors duration-300 ${themeMode === 'dark' ? 'dark bg-[#070214] text-slate-100' : 'bg-[#fafcff] text-slate-800'}`}
-        >
-          {/* 1. Left Sidebar Navigation */}
+        ) : viewMode === 'landing' ? (
+          <OfficialLanding
+            onOpenWorkspace={() => setViewMode('chat')}
+            sharedUrl={getCleanSharedUrl()}
+          />
+        ) : (
+          <motion.div
+            key="main-app"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className={`flex h-[100dvh] w-[100dvw] overflow-hidden overscroll-none transition-colors duration-300 relative ${themeMode === 'dark' ? 'dark bg-transparent text-slate-100' : 'bg-[#fafcff] text-slate-800'}`}
+          >
+            {/* 1. Left Sidebar Navigation */}
           <Sidebar
             sessions={sessions}
             activeSessionId={activeSessionId}
             onSelectSession={handleSelectSession}
             onDeleteSession={handleDeleteSession}
+            onClearAllChats={handleClearAllChats}
             onNewChat={handleNewChat}
             themePreset={themePreset}
             onChangeThemePreset={handleThemeChange}
@@ -527,7 +539,7 @@ export default function App() {
           <div className="flex-1 flex flex-col min-w-0 h-full relative">
             {/* Dynamic header navigation */}
             <header className={`flex items-center justify-between px-4 py-3.5 backdrop-blur-md border-b z-20 select-none transition-colors duration-300 ${
-              themeMode === 'dark' ? 'bg-[#0d041e]/80 border-purple-950/20' : 'bg-white/70 border-slate-200/80'
+              themeMode === 'dark' ? 'bg-[#0a0a0a]/60 border-slate-800/50' : 'bg-white/70 border-slate-200/80'
             }`}>
               <div className="flex items-center gap-3">
                 <button
@@ -593,7 +605,7 @@ export default function App() {
 
             {/* Conditionally Render Chat vs PWA Download Hub */}
             {viewMode === 'install' ? (
-              <div className="flex-1 overflow-y-auto bg-[#fafcff] dark:bg-[#0c1220] transition-colors duration-300">
+              <div className="flex-1 overflow-y-auto bg-[#fafcff] dark:bg-transparent transition-colors duration-300">
                 <InstallHub onBack={() => setViewMode('chat')} sharedUrl={getCleanSharedUrl()} />
               </div>
             ) : (
@@ -678,5 +690,6 @@ export default function App() {
         </motion.div>
       )}
     </AnimatePresence>
+    </>
   );
 }

@@ -338,7 +338,7 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
     const uniqueModels = Array.from(new Set(modelsToTry));
 
     for (const modelName of uniqueModels) {
-      for (let attempt = 1; attempt <= 1; attempt++) {
+      for (let attempt = 1; attempt <= 10; attempt++) {
         try {
           ai = getGeminiClient(); // Rotate key
           console.log(`[Chat] Connecting stream using model: ${modelName} (Mode: ${mode})`);
@@ -483,7 +483,7 @@ app.post("/api/suggest-title", async (req: Request, res: Response): Promise<void
     const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-flash-lite-latest", "gemini-flash-latest"];
 
     for (const modelName of modelsToTry) {
-      for (let attempt = 1; attempt <= 1; attempt++) {
+      for (let attempt = 1; attempt <= 10; attempt++) {
         try {
           ai = getGeminiClient(); // Rotate key
           console.log(`[Title] Attempt ${attempt} using model: ${modelName}`);
