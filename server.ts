@@ -9,7 +9,7 @@ dotenv.config();
 import fs from 'fs';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 // Allow large payloads for base64 file attachments (PDFs, images, code files)
 app.use(express.json({ limit: "50mb" }));
