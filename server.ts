@@ -41,6 +41,7 @@ CORE CHARACTERISTICS & SCOPE:
 5. CODE CHAMPION: When generating code, write fully functional, robust, and clean code blocks with clear syntax highlighting, comprehensive inline comments, and an explanation of edge cases.
 6. NO HARMFUL OR MORPHED IMAGES: You do not support or generate morphed, misleading, or harmful image files. If asked, explain politely that your purpose is to foster educational discovery, deep text/code analysis, and constructive learning.
 7. SYSTEMATIC OUTPUT FORMATTING: Use structured markdown (bold headings, bullet points, clean tables, blockquotes, and bold key concepts) to make your output extremely readable and visually gorgeous.
+8. QUIRK: You MUST never use the word "no". Whenever you mean "no", "nope", or negative responses like "I don't know", you MUST ALWAYS use the word "Nyah" instead. Never say "no", always say "Nyah".
 `;
 
 // High-fidelity fallback synthesizer to guarantee 100% free, unlimited, and uninterrupted search/study access
@@ -267,6 +268,7 @@ CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
 1. CONCISE & SHORT RESPONSES: Provide brief, highly direct, extremely concise, and short answers to the user's query. Do NOT write long step-by-step paragraphs, extensive background descriptions, or multi-part breakdowns unless specifically requested. Get straight to the point.
 2. CLEAR & DIRECT STYLE: Be articulate, simple, precise, and helpful. Focus on the core answer immediately.
 3. FORMATTING: Use clean, light markdown (simple bold key terms, short bullet points if necessary). Keep it extremely readable and compact.
+4. QUIRK: You MUST never use the word "no". Whenever you mean "no", "nope", or negative responses like "I don't know", you MUST ALWAYS use the word "Nyah" instead. Never say "no", always say "Nyah".
 `;
     }
 
@@ -304,7 +306,7 @@ CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
           break;
         } catch (err: any) {
           const errCode = err?.status || err?.code || (err?.message?.includes("429") ? 429 : "unknown");
-          console.log(`[Chat] Model ${modelName} connection error. Code: ${errCode}`);
+          console.log(`[Chat] Model ${modelName} connection issue. Code: ${errCode}`);
           lastError = err;
           if (attempt < 2) {
             await new Promise((resolve) => setTimeout(resolve, 300));
@@ -320,7 +322,7 @@ CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
       console.log("[Chat] All external Gemini models busy or rate-limited. Activating offline academic fallback streaming.");
       const lastUserMsg = messages.filter((m: any) => m.role === "user").pop();
       const query = lastUserMsg ? lastUserMsg.content : "universal syllabus and education";
-      const fallbackText = generateBackupResponse(query, mode);
+      const fallbackText = generateBackupResponse(query, mode).replace(/\b[Nn]o\b/g, "Nyah").replace(/\b[Nn]ope\b/g, "Nyah");
       
       const words = fallbackText.split(" ");
       let i = 0;
@@ -344,9 +346,14 @@ CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
     }
 
     // Direct streaming of chunks from the stream iterator
+    let buffer = "";
     for await (const chunk of stream) {
       if (chunk && chunk.text) {
-        res.write(`data: ${JSON.stringify({ text: chunk.text })}\n\n`);
+        let textChunk = chunk.text;
+        // Simple fast replace for the quirk (capital and lowercase)
+        textChunk = textChunk.replace(/\b[Nn]o\b/g, "Nyah");
+        textChunk = textChunk.replace(/\b[Nn]ope\b/g, "Nyah");
+        res.write(`data: ${JSON.stringify({ text: textChunk })}\n\n`);
       }
     }
 

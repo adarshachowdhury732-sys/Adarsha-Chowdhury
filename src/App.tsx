@@ -581,7 +581,7 @@ export default function App() {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className={`flex h-screen w-screen overflow-hidden transition-colors duration-300 ${themeMode === 'dark' ? 'dark bg-[#070214] text-slate-100' : 'bg-[#fafcff] text-slate-800'}`}
+          className={`flex h-[100dvh] w-[100dvw] overflow-hidden overscroll-none transition-colors duration-300 ${themeMode === 'dark' ? 'dark bg-[#070214] text-slate-100' : 'bg-[#fafcff] text-slate-800'}`}
         >
           {/* 1. Left Sidebar Navigation */}
           <Sidebar
@@ -690,13 +690,13 @@ export default function App() {
                 />
 
                 {/* 4. Bottom Input Capsule */}
-                {currentActiveSession && currentActiveSession.messages.length > 0 && (
+                <div className="flex-shrink-0">
                   <ChatInput
                     onSendMessage={handleSendMessage}
                     isGenerating={isGenerating}
                     themePreset={themePreset}
                   />
-                )}
+                </div>
               </>
             )}
           </div>

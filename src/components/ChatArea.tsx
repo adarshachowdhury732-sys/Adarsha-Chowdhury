@@ -134,7 +134,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-4 py-6 md:px-8 space-y-6"
+        className="flex-1 overflow-y-auto overscroll-none px-4 py-6 md:px-8 space-y-6"
       >
         {!hasMessages ? (
           // HOME / WELCOME SCREEN (When no messages are staged)
@@ -195,17 +195,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
               </div>
             </div>
 
-            {/* Centralized Search/Query Bar (Minimally Cleared) */}
-            <div className="mb-8 bg-slate-50/40 dark:bg-slate-900/10 rounded-[32px] p-1 border border-slate-200/50 dark:border-slate-800/50 shadow-xs">
-              <ChatInput
-                onSendMessage={onSendMessage}
-                isGenerating={isGenerating}
-                themePreset={themePreset}
-              />
-            </div>
-
             {/* Quick try options (Elegant Rounded Text Pills) */}
-            <div className="flex flex-wrap justify-center gap-2 max-w-xl mx-auto px-4">
+            <div className="flex flex-wrap justify-center gap-2 max-w-xl mx-auto px-4 mt-8">
               <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider self-center mr-1">
                 Try asking:
               </span>

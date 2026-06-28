@@ -31,12 +31,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     }
   }, [inputText]);
 
-  // Auto-focus when generation finishes
-  useEffect(() => {
-    if (!isGenerating) {
-      textareaRef.current?.focus();
-    }
-  }, [isGenerating]);
+  // Removed auto-focus to prevent mobile keyboard from popping up unexpectedly
 
   // Setup Browser Native Speech Recognition
   useEffect(() => {
@@ -181,10 +176,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     // Reset height of textarea
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      // Seamless auto-focus to keep the search flowing
-      setTimeout(() => {
-        textareaRef.current?.focus();
-      }, 50);
     }
   };
 
