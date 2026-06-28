@@ -348,8 +348,9 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
             config: {
               systemInstruction: activeSystemInstruction,
               temperature: mode === "search" ? 0.4 : 0.7,
-              tools: [
-                { googleSearch: {} },
+              tools: mode === "search" ? [
+                { googleSearch: {} }
+              ] : [
                 {
                   functionDeclarations: [
                     {
