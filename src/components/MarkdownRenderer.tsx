@@ -274,16 +274,24 @@ const TextBlock: React.FC<TextBlockProps> = ({ text }) => {
   return <>{renderedElements}</>;
 };
 
-// Helper function to parse inline markdown (bold, italic, inline code)
+// Helper function to parse inline markdown (images, bold, italic, inline code)
 function parseInlineFormatting(text: string): React.ReactNode[] {
   if (!text) return [];
 
-  // Parse bold (**text**), italic (*text*), inline code (`code`)
-  const regex = /(\*\*.*?\*\*|\*.*?\*|`.*?`)/g;
+  // Parse images (![alt](url)), bold (**text**), italic (*text*), inline code (`code`)
+  const regex = /(!\[.*?\]\(.*?\)|\*\*.*?\*\*|\*.*?\*|`.*?`)/g;
   const parts = text.split(regex);
 
   return parts.map((part, index) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
+    if (part.startsWith('![') && part.includes('](') && part.endsWith(')')) {
+      const altMatch = part.match(/!\[(.*?)\]/);
+      const urlMatch = part.match(/\((.*?)\)/);
+      const alt = altMatch ? altMatch[1] : '';
+      const url = urlMatch ? urlMatch[1] : '';
+      return (
+        <img key={index} src={url} alt={alt} className="max-w-full h-auto rounded-xl shadow-md border border-slate-100 my-4" />
+      );
+    } else if (part.startsWith('**') && part.endsWith('**')) {
       return (
         <strong key={index} className="font-semibold text-slate-900">
           {part.slice(2, -2)}

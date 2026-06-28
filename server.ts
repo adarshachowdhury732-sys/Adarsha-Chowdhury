@@ -289,8 +289,8 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
     let actualModel = selectedModel;
 
     const modelsToTry = [selectedModel];
-    if (selectedModel !== "gemini-2.5-flash") {
-      modelsToTry.push("gemini-2.5-flash");
+    if (selectedModel !== "gemini-2.5-flash-lite") {
+      modelsToTry.push("gemini-2.5-flash-lite");
     }
     const uniqueModels = Array.from(new Set(modelsToTry));
 
@@ -345,7 +345,8 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
     }
 
     if (lastError || !stream) {
-      console.log("[Chat] All external Gemini models busy or rate-limited. Activating offline academic fallback streaming.");
+      require('fs').writeFileSync('last_error.txt', `LastError: ${lastError?.message}`);
+      console.log("[Chat] All external Gemini models busy or rate-limited. Activating offline academic fallback streaming. lastError:", lastError?.message);
       const lastUserMsg = messages.filter((m: any) => m.role === "user").pop();
       const query = lastUserMsg ? lastUserMsg.content : "universal syllabus and education";
       const fallbackText = generateBackupResponse(query, mode).replace(/\bno\b/gi, "Nyah").replace(/\bnope\b/gi, "Nyah");
@@ -392,6 +393,12 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
                 res.write(`data: ${JSON.stringify({ text: `\n\n*(Error generating image)*\n\n` })}\n\n`);
               }
             }
+          } else if (call.name === "run_code") {
+             const code = (call.args as any)?.code as string;
+             const lang = (call.args as any)?.language as string || "";
+             if (code) {
+               res.write(`data: ${JSON.stringify({ text: `\n\n\`\`\`${lang}\n${code}\n\`\`\`\n\n` })}\n\n`);
+             }
           }
         }
       }
@@ -424,7 +431,7 @@ app.post("/api/suggest-title", async (req: Request, res: Response): Promise<void
     let response = null;
     let lastError: any = null;
 
-    const modelsToTry = ["gemini-2.5-flash"];
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
 
     for (const modelName of modelsToTry) {
       for (let attempt = 1; attempt <= 1; attempt++) {
