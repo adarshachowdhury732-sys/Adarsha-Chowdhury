@@ -58,12 +58,7 @@ function generateBackupResponse(query: string, mode: string = "study"): string {
       shortAnswer = `**Barsha Quick Search:** Your query "${query}" touches on an integrated study subject. Key considerations include tracing historical academic paradigms, looking at modern global developments, and consulting peer-reviewed research.`;
     }
     
-    return `*Notice: Operating in **Barsha Academic Offline Search Mode**.*
-
-${shortAnswer}
-
----
-*Barsha Search Mode is active and unlimited. Switch to Study Mode for detailed, step-by-step academic explanations!*`;
+    return `${shortAnswer}`;
   }
   
   let title = "Academic Exploration & Synthesis";
@@ -196,18 +191,14 @@ This structured model shows that study topics are highly interconnected. Success
 * **Next Steps:** We recommend diving into peer-reviewed research, comparative studies, and structural diagrams to expand your depth.`;
   }
 
-  return `*Notice: The universal AI engine is currently operating in **Barsha Academic Offline Synthesis Mode** to ensure your workspace remains 100% active, free, and unlimited during high external demand.*
-
-## ${title}
+  return `## ${title}
 
 ${section1}
 
 ${section2}
 
 ${section3}
-
----
-*Barsha is ready for unlimited learning. Feel free to type your next academic search query below!*`;
+`;
 }
 
 // API Routes
@@ -279,17 +270,11 @@ CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
     let lastError: any = null;
     let actualModel = selectedModel;
 
-    const modelsToTry = [selectedModel];
-    if (selectedModel === "gemini-3.1-pro-preview") {
-      modelsToTry.push("gemini-3.5-flash", "gemini-3.1-flash-lite");
-    } else {
-      modelsToTry.push("gemini-3.1-flash-lite");
-    }
-
+    const modelsToTry = [selectedModel, "gemini-2.5-flash"];
     const uniqueModels = Array.from(new Set(modelsToTry));
 
     for (const modelName of uniqueModels) {
-      for (let attempt = 1; attempt <= 2; attempt++) {
+      for (let attempt = 1; attempt <= 1; attempt++) {
         try {
           console.log(`[Chat] Connecting stream using model: ${modelName} (Mode: ${mode})`);
           stream = await ai.models.generateContentStream({
@@ -322,7 +307,7 @@ CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
       console.log("[Chat] All external Gemini models busy or rate-limited. Activating offline academic fallback streaming.");
       const lastUserMsg = messages.filter((m: any) => m.role === "user").pop();
       const query = lastUserMsg ? lastUserMsg.content : "universal syllabus and education";
-      const fallbackText = generateBackupResponse(query, mode).replace(/\b[Nn]o\b/g, "Nyah").replace(/\b[Nn]ope\b/g, "Nyah");
+      const fallbackText = generateBackupResponse(query, mode).replace(/\bno\b/gi, "Nyah").replace(/\bnope\b/gi, "Nyah");
       
       const words = fallbackText.split(" ");
       let i = 0;
@@ -338,11 +323,8 @@ CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
       return;
     }
 
-    // Write a notice if we had to fall back to a different model due to quota limits or high demand
     if (actualModel !== selectedModel) {
-      const fallbackName = actualModel === "gemini-3.5-flash" ? "Barsha Speed-Optimized Core" : "Barsha Lite Core";
-      const originalName = selectedModel === "gemini-3.1-pro-preview" ? "Barsha Pro Deep-Reasoning Core" : "Barsha Speed-Optimized Core";
-      res.write(`data: ${JSON.stringify({ text: `*Notice: The high-demand ${originalName} is currently at its quota limit or unavailable. I have seamlessly switched to the robust **${fallbackName}** to keep your study session uninterrupted.*\n\n---\n\n` })}\n\n`);
+      // Intentionally left blank, do not inject notice string
     }
 
     // Direct streaming of chunks from the stream iterator
@@ -350,9 +332,9 @@ CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
     for await (const chunk of stream) {
       if (chunk && chunk.text) {
         let textChunk = chunk.text;
-        // Simple fast replace for the quirk (capital and lowercase)
-        textChunk = textChunk.replace(/\b[Nn]o\b/g, "Nyah");
-        textChunk = textChunk.replace(/\b[Nn]ope\b/g, "Nyah");
+        // Simple fast replace for the quirk
+        textChunk = textChunk.replace(/\bno\b/gi, "Nyah");
+        textChunk = textChunk.replace(/\bnope\b/gi, "Nyah");
         res.write(`data: ${JSON.stringify({ text: textChunk })}\n\n`);
       }
     }
@@ -384,10 +366,10 @@ app.post("/api/suggest-title", async (req: Request, res: Response): Promise<void
     let response = null;
     let lastError: any = null;
 
-    const modelsToTry = ["gemini-3.5-flash", "gemini-3.1-flash-lite"];
+    const modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash"];
 
     for (const modelName of modelsToTry) {
-      for (let attempt = 1; attempt <= 2; attempt++) {
+      for (let attempt = 1; attempt <= 1; attempt++) {
         try {
           console.log(`[Title] Attempt ${attempt} using model: ${modelName}`);
           response = await ai.models.generateContent({

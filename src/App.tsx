@@ -14,10 +14,9 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    // Beautiful, premium timing to showcase the initial branding
     const timer = setTimeout(() => {
       setShowSplash(false);
-    }, 2200);
+    }, 1200);
     return () => clearTimeout(timer);
   }, []);
 
@@ -166,10 +165,7 @@ export default function App() {
         const parsed = JSON.parse(savedSessions);
         if (Array.isArray(parsed)) {
           setSessions(parsed);
-          // Auto-select latest active workspace if present
-          if (parsed.length > 0) {
-            setActiveSessionId(parsed[0].id);
-          }
+          // Start with a fresh chat screen rather than auto-selecting the latest session
         }
       }
 
@@ -483,92 +479,18 @@ export default function App() {
         <motion.div
           key="splash-screen"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.05 }}
-          transition={{ duration: 0.65, ease: [0.34, 1.56, 0.64, 1] }}
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#070514] overflow-hidden select-none"
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className={`fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden select-none transition-colors duration-300 ${themeMode === 'dark' ? 'bg-[#070214]' : 'bg-[#fafcff]'}`}
         >
-          {/* Ambient Cosmic Background Glows */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-purple-500/10 to-indigo-500/10 blur-[120px] pointer-events-none" />
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-gradient-to-r from-purple-500/5 to-indigo-500/5 blur-[80px] pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
-
-          {/* Logo / Symbol Animation */}
-          <div className="relative mb-8 flex flex-col items-center justify-center">
-            {/* Spinning/pulsing circular outline */}
-            <motion.div
-              initial={{ rotate: 0, scale: 0.8, opacity: 0 }}
-              animate={{ rotate: 360, scale: 1, opacity: 1 }}
-              transition={{
-                rotate: { duration: 25, ease: "linear", repeat: Infinity },
-                scale: { duration: 1.2, ease: "easeOut" },
-                opacity: { duration: 1 }
-              }}
-              className="absolute w-24 h-24 rounded-full border border-dashed border-purple-500/30"
-            />
-            
-            {/* Outer solid rings */}
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: [0.85, 1.15, 0.85], opacity: [0.3, 0.8, 0.3] }}
-              transition={{
-                duration: 3,
-                ease: "easeInOut",
-                repeat: Infinity,
-              }}
-              className="absolute w-20 h-20 rounded-full border border-purple-400/20"
-            />
-
-            {/* Core Icon Container */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{
-                type: "spring",
-                stiffness: 120,
-                damping: 15,
-                delay: 0.2
-              }}
-              className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-2xl shadow-purple-500/20 border border-purple-400/20"
-            >
-              <Sparkles className="w-8 h-8 text-white" />
-            </motion.div>
-          </div>
-
-          {/* Brand/App Title Text with staggered letter animations */}
-          <div className="text-center z-10 flex flex-col items-center">
-            <motion.h1
-              initial={{ letterSpacing: "0.1em", opacity: 0, y: 15 }}
-              animate={{ letterSpacing: "0.3em", opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-              className="text-2xl font-black font-display text-white tracking-widest uppercase flex items-center justify-center gap-1.5"
-            >
-              BARSHA
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-            </motion.h1>
-
-            {/* Glowing Tagline */}
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 0.8, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut", delay: 0.8 }}
-              className="text-xs text-purple-200/60 font-mono tracking-wider mt-2.5 max-w-[280px]"
-            >
-              YOUR INTELLIGENT ACADEMIC COMPANION
-            </motion.p>
-
-            {/* Elegant loading bar */}
-            <div className="w-40 h-[2px] bg-slate-900 rounded-full overflow-hidden mt-8 relative">
-              <motion.div
-                initial={{ left: "-100%" }}
-                animate={{ left: "100%" }}
-                transition={{
-                  duration: 2.0,
-                  ease: "easeInOut",
-                  repeat: 0,
-                }}
-                className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-purple-500 to-indigo-400 rounded-full shadow-[0_0_8px_rgba(147,51,234,0.5)]"
-              />
-            </div>
-          </div>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: [0.8, 1.1, 1], opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className={`w-16 h-16 rounded-2xl flex items-center justify-center ${themeMode === 'dark' ? 'bg-white text-black' : 'bg-black text-white'}`}
+          >
+            <Sparkles className="w-8 h-8" />
+          </motion.div>
         </motion.div>
       ) : viewMode === 'landing' ? (
         <OfficialLanding
