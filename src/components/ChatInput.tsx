@@ -299,7 +299,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 hover:border-slate-300 text-xs text-slate-600 py-1.5 px-3 rounded-lg focus:outline-none transition-all font-semibold mr-1 cursor-pointer"
                 >
                   {currentModel === 'gemini-1.5-flash' ? 'Barsha Spark' : 
-                   currentModel === 'gemini-2.5-flash' ? 'Barsha Spark 2.5' : 
+                   currentModel === 'gemini-2.0-flash' ? 'Barsha Spark 2.0' : 
                    'Barsha Pro'}
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -314,16 +314,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   <div className="p-1">
                     <button
                       onClick={() => {
-                        onChangeModel('gemini-2.5-flash');
+                        onChangeModel('gemini-2.0-flash');
                         document.getElementById('model-dropdown')?.classList.add('hidden');
                       }}
-                      className={`w-full text-left px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer ${currentModel === 'gemini-2.5-flash' ? 'bg-sky-50' : ''}`}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer ${currentModel === 'gemini-2.0-flash' ? 'bg-sky-50' : ''}`}
                     >
                       <div className="font-semibold text-sm text-slate-700 flex justify-between items-center">
-                        Barsha Spark 2.5
-                        {currentModel === 'gemini-2.5-flash' && <div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>}
+                        Barsha Spark 2.0
+                        {currentModel === 'gemini-2.0-flash' && <div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>}
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">Fastest model for everyday tasks and casual searches</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">Next-gen fastest model for everyday tasks and casual searches</div>
                     </button>
                     <button
                       onClick={() => {
@@ -340,14 +340,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                     </button>
                     <button
                       onClick={() => {
-                        onChangeModel('gemini-3.1-pro-preview');
+                        onChangeModel('gemini-1.5-pro');
                         document.getElementById('model-dropdown')?.classList.add('hidden');
                       }}
-                      className={`w-full text-left px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer ${currentModel === 'gemini-3.1-pro-preview' ? 'bg-sky-50' : ''}`}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer ${currentModel === 'gemini-1.5-pro' ? 'bg-sky-50' : ''}`}
                     >
                       <div className="font-semibold text-sm text-slate-700 flex justify-between items-center">
                         Barsha Pro
-                        {currentModel === 'gemini-3.1-pro-preview' && <div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>}
+                        {currentModel === 'gemini-1.5-pro' && <div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>}
                       </div>
                       <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">Advanced reasoning for complex academic analysis</div>
                     </button>

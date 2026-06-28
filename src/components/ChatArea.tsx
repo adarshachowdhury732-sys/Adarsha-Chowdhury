@@ -246,18 +246,11 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 return (
                   <motion.div
                     key={message.id}
-                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                     className={`flex gap-3 md:gap-4 ${isUser ? 'justify-end' : 'justify-start'} message-print-block`}
                   >
-                  {/* Left Avatar (only for Assistant) */}
-                  {!isUser && (
-                    <div className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center bg-gradient-to-tr from-purple-600 to-indigo-600 text-white border border-purple-500/20 shadow-3xs">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                  )}
-
                   {/* Message Container */}
                   <div className={`max-w-[85%] flex flex-col space-y-1.5 ${isUser ? 'items-end' : 'items-start'} w-full`}>
                     {/* Academic Print Labels */}
@@ -303,10 +296,10 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                     )}
 
                     {/* Speech / Text Bubble */}
-                    <div className={`rounded-2xl px-4 py-3 md:py-3.5 shadow-4xs leading-relaxed w-full ${
+                    <div className={`leading-relaxed w-full ${
                       isUser
-                        ? 'bg-sky-500 text-white rounded-br-none font-medium text-sm md:text-base border border-sky-400/20'
-                        : 'bg-white border border-slate-200/65 rounded-bl-none'
+                        ? 'rounded-2xl px-4 py-3 md:py-3.5 shadow-4xs bg-sky-500 text-white rounded-br-none font-medium text-sm md:text-base border border-sky-400/20'
+                        : 'text-slate-800 text-sm md:text-base'
                     }`}>
                       {isUser ? (
                         <p className="whitespace-pre-wrap break-words">{message.content}</p>
@@ -315,18 +308,12 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                       )}
                     </div>
 
-                    {/* Metadata (timestamp / insights suggestions) */}
-                    <div className="flex items-center gap-2 px-1 text-[10px] text-slate-400 font-medium select-none">
-                      <span>{new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      {!isUser && (
-                        <>
-                          <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                          <span className="text-sky-500/90 font-semibold flex items-center gap-0.5">
-                            <Sparkles className="w-2.5 h-2.5" /> Barsha Engine
-                          </span>
-                        </>
-                      )}
-                    </div>
+                    {/* Metadata (timestamp) */}
+                    {isUser && (
+                      <div className="flex items-center gap-2 px-1 text-[10px] text-slate-400 font-medium select-none">
+                        <span>{new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    )}
 
                     {/* Interactive suggestions underneath Barsha responses */}
                     {!isUser && message.suggestions && message.suggestions.length > 0 && (

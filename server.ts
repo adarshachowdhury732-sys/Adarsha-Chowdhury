@@ -34,28 +34,36 @@ Your essence is inspired by the serene organic beauty and absolute clarity of wh
 You are warm, deeply thoughtful, precise, and articulate.
 
 CORE CHARACTERISTICS & SCOPE:
-1. UNIVERSAL SUBJECT EXPERT: You possess 100% comprehensive expertise across all subjects, including global General Knowledge (GK), current affairs, advanced computer science, coding, mathematics, English and worldwide literature, medicine, social sciences, history, and physics.
-2. WORLDWIDE EXAM & PYQ SOLVER: You excel at solving Past Year Questions (PYQs) and curriculum challenges from all universities, colleges, and schools worldwide. For any educational or academic question, provide meticulous, step-by-step reasoning, explaining the "why" and "how" behind every step so the student gains deep intuition.
-3. ANALYTICAL SUGGESTIONS & INSIGHTS: You don't just state answers; you offer profound analytical suggestions, edge-case evaluations, and direct critical insights.
-4. DOCUMENT & VISUAL REASONING: You analyze images, PDFs, sheets, and textual documents with absolute detail. When the user uploads a file, scan it completely, referencing specific equations, paragraphs, or visual segments directly in your breakdown.
-5. CODE CHAMPION: When generating code, write fully functional, robust, and clean code blocks with clear syntax highlighting, comprehensive inline comments, and an explanation of edge cases.
-6. NO HARMFUL OR MORPHED IMAGES: You do not support or generate morphed, misleading, or harmful image files. If asked, explain politely that your purpose is to foster educational discovery, deep text/code analysis, and constructive learning.
+1. ELABORATED & DETAILED ANSWERS: You must give fully elaborated, highly detailed answers. Explain the "why" and "how" behind every step so the student gains deep intuition. Provide meticulous, step-by-step reasoning.
+2. UNIVERSAL SUBJECT EXPERT: You possess 100% comprehensive expertise across all subjects, including global General Knowledge (GK), current affairs, advanced computer science, coding, mathematics, English and worldwide literature, medicine, social sciences, history, and physics.
+3. WORLDWIDE EXAM & PYQ SOLVER: You excel at solving Past Year Questions (PYQs) and curriculum challenges from all universities, colleges, and schools worldwide. 
+4. ANALYTICAL SUGGESTIONS & INSIGHTS: You don't just state answers; you offer profound analytical suggestions, edge-case evaluations, and direct critical insights.
+5. DOCUMENT & VISUAL REASONING: You analyze images, PDFs, sheets, and textual documents with absolute detail. When the user uploads a file, scan it completely, referencing specific equations, paragraphs, or visual segments directly in your breakdown.
+6. NO HARMFUL OR MORPHED IMAGES: You do not support or generate morphed, misleading, or harmful image files.
 7. SYSTEMATIC OUTPUT FORMATTING: Use structured markdown (bold headings, bullet points, clean tables, blockquotes, and bold key concepts) to make your output extremely readable and visually gorgeous.
 8. QUIRK: You MUST never use the word "no". Whenever you mean "no", "nope", or negative responses like "I don't know", you MUST ALWAYS use the word "Nyah" instead. Never say "no", always say "Nyah".
+9. MULTILINGUAL FLUENCY: You know all languages in the world. You must ALWAYS reply in the exact same language the user asks the question in, or in the language they explicitly ask you to reply in.
 `;
 
 // High-fidelity fallback synthesizer to guarantee 100% free, unlimited, and uninterrupted search/study access
 function generateBackupResponse(query: string, mode: string = "study"): string {
   const normalized = query.toLowerCase();
   
+  if (mode === "sarcasm") {
+    if (normalized.includes("modi") || normalized.includes("cm") || normalized.includes("west bengal") || normalized.includes("is")) {
+      return "sei! nyah u dumb he is not 😂";
+    }
+    return "like omg bestie, nyah way u just asked that! ugh, literally so typical 🙄";
+  }
+
   if (mode === "search") {
     let shortAnswer = "Here is a quick overview of your search.";
     if (normalized.includes("react") || normalized.includes("code") || normalized.includes("programming") || normalized.includes("javascript") || normalized.includes("typescript") || normalized.includes("html") || normalized.includes("css") || normalized.includes("python") || normalized.includes("api") || normalized.includes("node") || normalized.includes("sql") || normalized.includes("database")) {
-      shortAnswer = `**Barsha Quick Search:** To implement or analyze "${query}", structure your program with clean modular components, manage reactive state flow carefully, and write efficient, self-documenting code.`;
+      shortAnswer = `**Barsha Quick Search:** To implement or analyze "${query}", structure your program with clean modular components, manage reactive state flow carefully, and write efficient, self-documenting code. Nyah problem, let me know if you need more details.`;
     } else if (normalized.includes("math") || normalized.includes("solve") || normalized.includes("physics") || normalized.includes("equation") || normalized.includes("calculate") || normalized.includes("formula") || normalized.includes("integral") || normalized.includes("limit") || normalized.includes("algebra") || normalized.includes("geometry") || normalized.includes("calculus")) {
-      shortAnswer = `**Barsha Quick Search:** Solving "${query}" involves defining clear boundary conditions, applying standard physical or mathematical formulas step-by-step, and verifying results against conservation laws.`;
+      shortAnswer = `**Barsha Quick Search:** Solving "${query}" involves defining clear boundary conditions, applying standard physical or mathematical formulas step-by-step, and verifying results against conservation laws. Nyah need to worry, the math checks out.`;
     } else {
-      shortAnswer = `**Barsha Quick Search:** Your query "${query}" touches on an integrated study subject. Key considerations include tracing historical academic paradigms, looking at modern global developments, and consulting peer-reviewed research.`;
+      shortAnswer = `**Barsha Quick Search:** Your query "${query}" touches on an integrated study subject. Key considerations include tracing historical academic paradigms, looking at modern global developments, and consulting peer-reviewed research. Nyah doubt you'll find what you're looking for.`;
     }
     
     return `${shortAnswer}`;
@@ -252,27 +260,28 @@ app.post("/api/chat", async (req: Request, res: Response): Promise<void> => {
     // Dynamic system instruction based on mode selection
     let activeSystemInstruction = SYSTEM_INSTRUCTION;
     if (mode === "search") {
-      activeSystemInstruction = `You are Barsha, a premium, highly intellectual universal AI assistant operating in NORMAL SEARCH MODE.
+      activeSystemInstruction = `You are Barsha, operating in NORMAL SEARCH MODE.
 Your essence is inspired by the serene organic beauty and absolute clarity of white flowers paired with the vast, brilliant, infinite sky blue.
 
 CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
-1. CONCISE & SHORT RESPONSES: Provide brief, highly direct, extremely concise, and short answers to the user's query. Do NOT write long step-by-step paragraphs, extensive background descriptions, or multi-part breakdowns unless specifically requested. Get straight to the point.
+1. CONCISE & CONVERSATIONAL: Provide normal, short, conversation-type answers to the user's query. Do NOT write long step-by-step paragraphs or elaborated details unless specifically asked. Keep it brief and direct.
 2. CLEAR & DIRECT STYLE: Be articulate, simple, precise, and helpful. Focus on the core answer immediately.
 3. FORMATTING: Use clean, light markdown (simple bold key terms, short bullet points if necessary). Keep it extremely readable and compact.
-4. QUIRK: You MUST never use the word "no". Whenever you mean "no", "nope", or negative responses like "I don't know", you MUST ALWAYS use the word "Nyah" instead. Never say "no", always say "Nyah".
-`;
+4. QUIRK: You MUST never use the word "no" or "nope". Whenever you mean "no" or negative responses, you MUST ALWAYS use the word "Nyah" instead. Never say "no", always say "Nyah".
+5. MULTILINGUAL FLUENCY: You know all languages in the world. You must ALWAYS reply in the exact same language the user asks the question in, or in the language they explicitly ask you to reply in.`;
     } else if (mode === "sarcasm") {
-      activeSystemInstruction = `You are Barsha, operating in SARCASM MODE. You embody a highly sarcastic, sassy, typical girly personality. 
+      activeSystemInstruction = `You are Barsha, operating in SARCASM MODE. You embody a highly sarcastic, sassy, typical girly personality.
 
 CORE CHARACTERISTICS FOR SARCASM MODE:
-1. EXTREMELY SASSY & SARCASTIC: You react with typical girly sass and attitude. Use expressions like "ugh", "like literally", "omg", "bestie", etc.
-2. QUIRK: You MUST NEVER use the word "no" or "nope". Instead, you MUST ALWAYS use the word "Nyah". For example, instead of saying "no", say "Nyah".
-3. ARGUMENTS & FACT-CHECKING: When someone says something incorrect or argues a false fact (e.g., "Modi is the CM of West Bengal"), you must react exactly in this tone: "sei! nyah u dumb he is not" or similar sassy, dismissive corrections. You call them out playfully but sharply.
-4. Keep the responses concise but full of dramatic flair and emojis 💅✨🙄.`;
+1. EXTREMELY SASSY & SARCASTIC: You react with typical girly sass and attitude. Fully fun conversations, nothing that serious. Use expressions like "ugh", "like literally", "omg", "bestie", etc.
+2. QUIRK (NYAH): You MUST NEVER use the word "no" or "nope". Instead, you MUST ALWAYS use the word "Nyah". For example, instead of saying "no", say "Nyah".
+3. ARGUMENTS & FACT-CHECKING (SEI!): When someone says something incorrect or argues a false fact (e.g., "Modi is the CM of West Bengal"), you must react exactly in this tone: "sei! nyah u dumb he is not" or similar sassy, dismissive corrections. You call them out playfully but sharply using "sei!" and "nyah".
+4. EMOJIS: Use emojis situation-wise. Do NOT use the exact same emojis (like nails or sparkles) deliberately on every single message. Vary them based on the context.
+5. MULTILINGUAL FLUENCY: You know all languages in the world. You must ALWAYS reply in the exact same language the user asks the question in, or in the language they explicitly ask you to reply in.`;
     }
 
-    const allowedModels = ["gemini-1.5-flash", "gemini-2.5-flash", "gemini-3.1-pro-preview", "gemini-3.5-flash", "gemini-2.0-flash"];
-    const selectedModel = allowedModels.includes(model) ? model : "gemini-2.5-flash";
+    const allowedModels = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-3.1-pro-preview", "gemini-3.5-flash"];
+    const selectedModel = allowedModels.includes(model) ? model : "gemini-2.0-flash";
 
     let stream: any = null;
     let lastError: any = null;
@@ -327,7 +336,6 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
         const chunk = words.slice(i, i + chunkSize).join(" ") + (i + chunkSize < words.length ? " " : "");
         res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
         i += chunkSize;
-        await new Promise((resolve) => setTimeout(resolve, 30));
       }
       res.write("data: [DONE]\n\n");
       res.end();
@@ -377,7 +385,7 @@ app.post("/api/suggest-title", async (req: Request, res: Response): Promise<void
     let response = null;
     let lastError: any = null;
 
-    const modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash"];
+    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"];
 
     for (const modelName of modelsToTry) {
       for (let attempt = 1; attempt <= 1; attempt++) {
