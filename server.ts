@@ -26,7 +26,7 @@ const getGeminiClient = (): GoogleGenAI => {
   }
   
   for (const [key, value] of Object.entries(process.env)) {
-    if (key.startsWith('GEMINI_API_KEY_') && value) {
+    if ((key.startsWith('GEMINI_API_KEY_') || key.startsWith('API_KEY_')) && value) {
       value.split(',').map(k => k.trim()).filter(Boolean).forEach(k => keys.add(k));
     }
   }
