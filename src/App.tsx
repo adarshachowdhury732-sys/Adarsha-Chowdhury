@@ -24,7 +24,7 @@ export default function App() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [currentModel, setCurrentModel] = useState<string>('gemini-1.5-flash');
+  const [currentModel, setCurrentModel] = useState<string>('gemini-2.5-flash');
   const [themePreset, setThemePreset] = useState<'rose' | 'tulip' | 'dandelion'>('dandelion');
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
   const [appMode, setAppMode] = useState<'study' | 'search' | 'sarcasm'>('study');

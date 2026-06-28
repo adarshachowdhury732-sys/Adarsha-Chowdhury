@@ -281,16 +281,16 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
 5. MULTILINGUAL FLUENCY: You know all languages in the world. You must ALWAYS reply in the exact same language the user asks the question in, or in the language they explicitly ask you to reply in.`;
     }
 
-    const allowedModels = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-3.1-pro-preview", "gemini-3.5-flash"];
-    const selectedModel = allowedModels.includes(model) ? model : "gemini-2.0-flash";
+    const allowedModels = ["gemini-2.5-flash", "gemini-2.5-pro"];
+    const selectedModel = allowedModels.includes(model) ? model : "gemini-2.5-flash";
 
     let stream: any = null;
     let lastError: any = null;
     let actualModel = selectedModel;
 
     const modelsToTry = [selectedModel];
-    if (selectedModel !== "gemini-1.5-flash") {
-      modelsToTry.push("gemini-1.5-flash");
+    if (selectedModel !== "gemini-2.5-flash") {
+      modelsToTry.push("gemini-2.5-flash");
     }
     const uniqueModels = Array.from(new Set(modelsToTry));
 
@@ -332,7 +332,7 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
           break;
         } catch (err: any) {
           const errCode = err?.status || err?.code || (err?.message?.includes("429") ? 429 : "unknown");
-          console.log(`[Chat] Model ${modelName} connection issue. Code: ${errCode}`);
+          console.log(`[Chat] Model ${modelName} connection issue. Code: ${errCode}, Error: ${err?.message}`);
           lastError = err;
           if (attempt < 2) {
             await new Promise((resolve) => setTimeout(resolve, 300));
@@ -385,38 +385,11 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
             if (prompt) {
               try {
                 console.log(`[ImageGen] Generating image for prompt: ${prompt}`);
-                let lastUserParts = contents[contents.length - 1]?.parts || [];
-                let imageParts = lastUserParts.filter((p: any) => p.inlineData);
-                
-                const imageResponse = await ai.models.generateContent({
-                  model: 'gemini-2.5-flash-image',
-                  contents: {
-                    parts: [
-                      ...imageParts,
-                      { text: prompt },
-                    ],
-                  },
-                  config: {
-                    imageConfig: { aspectRatio: "1:1" }
-                  }
-                });
-                let base64Image = null;
-                if (imageResponse.candidates?.[0]?.content?.parts) {
-                   for (const part of imageResponse.candidates[0].content.parts) {
-                      if (part.inlineData) {
-                         base64Image = part.inlineData.data;
-                         break;
-                      }
-                   }
-                }
-                if (base64Image) {
-                   res.write(`data: ${JSON.stringify({ text: `\n\n![Generated Image](data:image/jpeg;base64,${base64Image})\n\n` })}\n\n`);
-                } else {
-                   res.write(`data: ${JSON.stringify({ text: `\n\n*(Failed to generate image)*\n\n` })}\n\n`);
-                }
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?nologo=true`;
+                res.write(`data: ${JSON.stringify({ text: `\n\n![${prompt}](${imageUrl})\n\n` })}\n\n`);
               } catch (e: any) {
                 console.error("Image generation failed:", e);
-                res.write(`data: ${JSON.stringify({ text: `\n\n*(Error generating image: ${e.message})*\n\n` })}\n\n`);
+                res.write(`data: ${JSON.stringify({ text: `\n\n*(Error generating image)*\n\n` })}\n\n`);
               }
             }
           }
@@ -451,7 +424,7 @@ app.post("/api/suggest-title", async (req: Request, res: Response): Promise<void
     let response = null;
     let lastError: any = null;
 
-    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"];
+    const modelsToTry = ["gemini-2.5-flash"];
 
     for (const modelName of modelsToTry) {
       for (let attempt = 1; attempt <= 1; attempt++) {
