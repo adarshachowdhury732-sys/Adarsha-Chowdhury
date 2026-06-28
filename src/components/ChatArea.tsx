@@ -151,8 +151,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
             <div className="text-center space-y-4 mb-8">
               <div className="inline-flex items-center justify-center relative">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20 relative z-10 transition-all duration-300 border border-purple-400/20 dark:from-slate-800 dark:to-slate-700">
-                  <img src="/flower-logo.png" alt="Barsha Logo" className="w-12 h-12 object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden') }} />
-                  <Sparkles className="w-8 h-8 text-white hidden" />
+                  <img src="/icon.svg" alt="Barsha Logo" className="w-12 h-12 object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]" />
                 </div>
                 <div className="absolute inset-0 bg-purple-500/10 rounded-2xl blur-md scale-115 animate-pulse" />
               </div>

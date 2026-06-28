@@ -60,8 +60,7 @@ export const OfficialLanding: React.FC<OfficialLandingProps> = ({ onOpenWorkspac
       {/* Header / Navigation Bar */}
       <header className="relative max-w-7xl mx-auto px-6 py-6 flex items-center justify-between border-b border-slate-200/10 z-10">
         <div className="flex items-center gap-3">
-          <img src="/flower-logo.png" alt="Barsha Logo" className="w-8 h-8 object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.6)]" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden') }} />
-          <Sparkles className="w-6 h-6 text-white hidden" />
+          <img src="/icon.svg" alt="Barsha Logo" className="w-8 h-8 object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.6)]" />
           <span className="font-bold text-xl text-white tracking-tight lowercase">
             barsha
           </span>

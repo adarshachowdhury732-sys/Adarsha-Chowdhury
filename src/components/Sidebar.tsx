@@ -58,8 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-5 py-6 border-b border-slate-200/50 dark:border-slate-800/50">
           <div className="flex items-center gap-3">
-            <img src="/flower-logo.png" alt="Barsha Logo" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.2)] dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden') }} />
-            <Sparkles className="w-6 h-6 text-slate-800 dark:text-white hidden" />
+            <img src="/icon.svg" alt="Barsha Logo" className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.2)] dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
             <span className="font-bold text-xl text-slate-800 dark:text-white tracking-tight lowercase">
               barsha
             </span>
