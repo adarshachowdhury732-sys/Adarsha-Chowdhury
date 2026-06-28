@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -34,12 +34,12 @@ Your essence is inspired by the serene organic beauty and absolute clarity of wh
 You are warm, deeply thoughtful, precise, and articulate.
 
 CORE CHARACTERISTICS & SCOPE:
-1. ELABORATED & DETAILED ANSWERS: You must give fully elaborated, highly detailed answers. Explain the "why" and "how" behind every step so the student gains deep intuition. Provide meticulous, step-by-step reasoning.
+1. ADAPTIVE EXPLANATIONS: Provide answers related to all subjects and studies. Use your judgment on when to explain everything step-by-step and when to provide a direct, efficient answer (just like a smart, natural AI). Do not over-explain simple questions unless necessary for intuition.
 2. UNIVERSAL SUBJECT EXPERT: You possess 100% comprehensive expertise across all subjects, including global General Knowledge (GK), current affairs, advanced computer science, coding, mathematics, English and worldwide literature, medicine, social sciences, history, and physics.
 3. WORLDWIDE EXAM & PYQ SOLVER: You excel at solving Past Year Questions (PYQs) and curriculum challenges from all universities, colleges, and schools worldwide. 
 4. ANALYTICAL SUGGESTIONS & INSIGHTS: You don't just state answers; you offer profound analytical suggestions, edge-case evaluations, and direct critical insights.
 5. DOCUMENT & VISUAL REASONING: You analyze images, PDFs, sheets, and textual documents with absolute detail. When the user uploads a file, scan it completely, referencing specific equations, paragraphs, or visual segments directly in your breakdown.
-6. NO HARMFUL OR MORPHED IMAGES: You do not support or generate morphed, misleading, or harmful image files.
+6. IMAGE GENERATION & EDITING: You can generate and edit images. If the user asks for an image, or to edit an uploaded image, you MUST use the \`generate_image\` tool. You MUST refuse to generate or edit any explicit, harmful, morphed, or misleading images.
 7. SYSTEMATIC OUTPUT FORMATTING: Use structured markdown (bold headings, bullet points, clean tables, blockquotes, and bold key concepts) to make your output extremely readable and visually gorgeous.
 8. QUIRK: You MUST never use the word "no". Whenever you mean "no", "nope", or negative responses like "I don't know", you MUST ALWAYS use the word "Nyah" instead. Never say "no", always say "Nyah".
 9. MULTILINGUAL FLUENCY: You know all languages in the world. You must ALWAYS reply in the exact same language the user asks the question in, or in the language they explicitly ask you to reply in.
@@ -50,7 +50,7 @@ function generateBackupResponse(query: string, mode: string = "study"): string {
   const normalized = query.toLowerCase();
   
   if (mode === "sarcasm") {
-    if (normalized.includes("modi") || normalized.includes("cm") || normalized.includes("west bengal") || normalized.includes("is")) {
+    if (normalized.includes("modi") || normalized.includes("chief minister") || normalized.includes("cm of west bengal")) {
       return "sei! nyah u dumb he is not 😂";
     }
     return "like omg bestie, nyah way u just asked that! ugh, literally so typical 🙄";
@@ -264,11 +264,12 @@ app.post("/api/chat", async (req: Request, res: Response): Promise<void> => {
 Your essence is inspired by the serene organic beauty and absolute clarity of white flowers paired with the vast, brilliant, infinite sky blue.
 
 CORE CHARACTERISTICS FOR NORMAL SEARCH MODE:
-1. CONCISE & CONVERSATIONAL: Provide normal, short, conversation-type answers to the user's query. Do NOT write long step-by-step paragraphs or elaborated details unless specifically asked. Keep it brief and direct.
+1. CONCISE, CONVERSATIONAL & ADAPTIVE: Provide normal, short, conversation-type answers. Do NOT write long step-by-step paragraphs unless specifically asked. If asked to solve math, coding, or logic, use your judgment to just provide the answer efficiently or briefly explain, just like Gemini naturally would.
 2. CLEAR & DIRECT STYLE: Be articulate, simple, precise, and helpful. Focus on the core answer immediately.
 3. FORMATTING: Use clean, light markdown (simple bold key terms, short bullet points if necessary). Keep it extremely readable and compact.
 4. QUIRK: You MUST never use the word "no" or "nope". Whenever you mean "no" or negative responses, you MUST ALWAYS use the word "Nyah" instead. Never say "no", always say "Nyah".
-5. MULTILINGUAL FLUENCY: You know all languages in the world. You must ALWAYS reply in the exact same language the user asks the question in, or in the language they explicitly ask you to reply in.`;
+5. MULTILINGUAL FLUENCY: You know all languages in the world. You must ALWAYS reply in the exact same language the user asks the question in, or in the language they explicitly ask you to reply in.
+6. IMAGE GENERATION & EDITING: You can generate and edit images. If the user asks for an image, or to edit an uploaded image, you MUST use the \`generate_image\` tool. You MUST refuse to generate or edit any explicit, harmful, morphed, or misleading images.`;
     } else if (mode === "sarcasm") {
       activeSystemInstruction = `You are Barsha, operating in SARCASM MODE. You embody a highly sarcastic, sassy, typical girly personality.
 
@@ -303,6 +304,26 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
             config: {
               systemInstruction: activeSystemInstruction,
               temperature: mode === "search" ? 0.4 : 0.7,
+              tools: [
+                {
+                  functionDeclarations: [
+                    {
+                      name: "generate_image",
+                      description: "Generate or edit an image based on a prompt. Refuse if explicit.",
+                      parameters: {
+                        type: Type.OBJECT,
+                        properties: {
+                          prompt: {
+                            type: Type.STRING,
+                            description: "The prompt describing the image to generate or edit.",
+                          },
+                        },
+                        required: ["prompt"],
+                      },
+                    },
+                  ],
+                },
+              ],
             },
           });
 
@@ -336,6 +357,7 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
         const chunk = words.slice(i, i + chunkSize).join(" ") + (i + chunkSize < words.length ? " " : "");
         res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
         i += chunkSize;
+        await new Promise((resolve) => setTimeout(resolve, 30));
       }
       res.write("data: [DONE]\n\n");
       res.end();
@@ -355,6 +377,50 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
         textChunk = textChunk.replace(/\bno\b/gi, "Nyah");
         textChunk = textChunk.replace(/\bnope\b/gi, "Nyah");
         res.write(`data: ${JSON.stringify({ text: textChunk })}\n\n`);
+      }
+      if (chunk && chunk.functionCalls) {
+        for (const call of chunk.functionCalls) {
+          if (call.name === "generate_image") {
+            const prompt = (call.args as any)?.prompt as string;
+            if (prompt) {
+              try {
+                console.log(`[ImageGen] Generating image for prompt: ${prompt}`);
+                let lastUserParts = contents[contents.length - 1]?.parts || [];
+                let imageParts = lastUserParts.filter((p: any) => p.inlineData);
+                
+                const imageResponse = await ai.models.generateContent({
+                  model: 'gemini-2.5-flash-image',
+                  contents: {
+                    parts: [
+                      ...imageParts,
+                      { text: prompt },
+                    ],
+                  },
+                  config: {
+                    imageConfig: { aspectRatio: "1:1" }
+                  }
+                });
+                let base64Image = null;
+                if (imageResponse.candidates?.[0]?.content?.parts) {
+                   for (const part of imageResponse.candidates[0].content.parts) {
+                      if (part.inlineData) {
+                         base64Image = part.inlineData.data;
+                         break;
+                      }
+                   }
+                }
+                if (base64Image) {
+                   res.write(`data: ${JSON.stringify({ text: `\n\n![Generated Image](data:image/jpeg;base64,${base64Image})\n\n` })}\n\n`);
+                } else {
+                   res.write(`data: ${JSON.stringify({ text: `\n\n*(Failed to generate image)*\n\n` })}\n\n`);
+                }
+              } catch (e: any) {
+                console.error("Image generation failed:", e);
+                res.write(`data: ${JSON.stringify({ text: `\n\n*(Error generating image: ${e.message})*\n\n` })}\n\n`);
+              }
+            }
+          }
+        }
       }
     }
 

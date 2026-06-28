@@ -308,13 +308,6 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                       )}
                     </div>
 
-                    {/* Metadata (timestamp) */}
-                    {isUser && (
-                      <div className="flex items-center gap-2 px-1 text-[10px] text-slate-400 font-medium select-none">
-                        <span>{new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-                    )}
-
                     {/* Interactive suggestions underneath Barsha responses */}
                     {!isUser && message.suggestions && message.suggestions.length > 0 && (
                       <div className="pt-2 flex flex-col gap-1.5 w-full">
