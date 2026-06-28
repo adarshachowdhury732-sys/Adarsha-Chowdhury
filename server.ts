@@ -6,19 +6,40 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+import fs from 'fs';
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Allow large payloads for base64 file attachments (PDFs, images, code files)
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+let currentKeyIndex = 0;
+
 // Initialize the GoogleGenAI client with key from environment
 const getGeminiClient = (): GoogleGenAI => {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  const keys = new Set<string>();
+  
+  if (process.env.GEMINI_API_KEY) {
+    process.env.GEMINI_API_KEY.split(',').map(k => k.trim()).filter(Boolean).forEach(k => keys.add(k));
+  }
+  
+  for (const [key, value] of Object.entries(process.env)) {
+    if (key.startsWith('GEMINI_API_KEY_') && value) {
+      value.split(',').map(k => k.trim()).filter(Boolean).forEach(k => keys.add(k));
+    }
+  }
+
+  const keyArray = Array.from(keys);
+  
+  if (keyArray.length === 0) {
     throw new Error("GEMINI_API_KEY environment variable is required but missing.");
   }
+
+  const apiKey = keyArray[currentKeyIndex % keyArray.length];
+  currentKeyIndex++; // Rotate for the next call
+
   return new GoogleGenAI({
     apiKey,
     httpOptions: {
@@ -47,14 +68,26 @@ CORE CHARACTERISTICS & SCOPE:
 `;
 
 // High-fidelity fallback synthesizer to guarantee 100% free, unlimited, and uninterrupted search/study access
-function generateBackupResponse(query: string, mode: string = "study"): string {
+function generateBackupResponse(query: string, mode: string = "study", lastError: any = null): string {
   const normalized = query.toLowerCase();
   
+  const isQuota = lastError?.status === 429 || lastError?.message?.includes("quota") || lastError?.message?.includes("RESOURCE_EXHAUSTED");
+  const isOverloaded = lastError?.status === 503;
+  const reason = isQuota ? "API quota exhaustion" : (isOverloaded ? "high traffic limits" : "offline mode");
+  const suffix = `\n\n*(Note: Real-time intelligence and live Search are currently disabled due to ${reason}. Please wait for the daily quota to reset or check your API key configuration.)*`;
+
   if (mode === "sarcasm") {
     if (normalized.includes("modi") || normalized.includes("chief minister") || normalized.includes("cm of west bengal")) {
       return "sei! nyah u dumb he is not 😂";
     }
-    return "like omg bestie, nyah way u just asked that! ugh, literally so typical 🙄";
+    
+    // Create a dynamic prefix based on the query length or first word so it doesn't look like a frozen bot
+    const firstWord = query.split(" ")[0] || "that";
+    
+    if (isQuota) {
+      return `like omg bestie, nyah way u just said "${firstWord}"... my brain is literally exhausted rn because of ${reason} 🙄. Nyah way u expect me to think more today, try again later when my API quota resets! 💅`;
+    }
+    return `like omg bestie, nyah way u just asked that! ugh, literally so typical 🙄 (P.S. I'm in ${reason} rn, so I can't really reply properly)`;
   }
 
   if (mode === "search") {
@@ -67,7 +100,7 @@ function generateBackupResponse(query: string, mode: string = "study"): string {
       shortAnswer = `**Barsha Quick Search:** Your query "${query}" touches on an integrated study subject. Key considerations include tracing historical academic paradigms, looking at modern global developments, and consulting peer-reviewed research. Nyah doubt you'll find what you're looking for.`;
     }
     
-    return `${shortAnswer}`;
+    return `${shortAnswer}${suffix}`;
   }
   
   let title = "Academic Exploration & Synthesis";
@@ -207,6 +240,8 @@ ${section1}
 ${section2}
 
 ${section3}
+
+${suffix}
 `;
 }
 
@@ -221,7 +256,7 @@ app.post("/api/chat", async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const ai = getGeminiClient();
+    let ai = getGeminiClient();
 
     // Map client messages format to Gemini format
     const contents = messages.map((msg) => {
@@ -296,13 +331,16 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
       modelsToTry.push("gemini-2.5-flash-lite");
     }
     modelsToTry.push("gemini-2.0-flash-lite");
+    modelsToTry.push("gemini-flash-lite-latest");
     modelsToTry.push("gemini-flash-latest");
+    modelsToTry.push("gemini-2.0-flash");
     modelsToTry.push("gemini-3.5-flash");
     const uniqueModels = Array.from(new Set(modelsToTry));
 
     for (const modelName of uniqueModels) {
       for (let attempt = 1; attempt <= 1; attempt++) {
         try {
+          ai = getGeminiClient(); // Rotate key
           console.log(`[Chat] Connecting stream using model: ${modelName} (Mode: ${mode})`);
           stream = await ai.models.generateContentStream({
             model: modelName,
@@ -352,11 +390,14 @@ CORE CHARACTERISTICS FOR SARCASM MODE:
     }
 
     if (lastError || !stream) {
-      require('fs').writeFileSync('last_error.txt', `LastError: ${lastError?.message}`);
+      try {
+        fs.writeFileSync('last_error_log.txt', JSON.stringify({ message: lastError?.message, code: lastError?.code, status: lastError?.status, name: lastError?.name, wholeError: lastError }, null, 2));
+      } catch (e) {}
+      console.error("[Chat] Streaming fallback triggered due to:", lastError);
       console.log("[Chat] All external Gemini models busy or rate-limited. Activating offline academic fallback streaming. lastError:", lastError?.message);
       const lastUserMsg = messages.filter((m: any) => m.role === "user").pop();
       const query = lastUserMsg ? lastUserMsg.content : "universal syllabus and education";
-      const fallbackText = generateBackupResponse(query, mode).replace(/\bno\b/gi, "Nyah").replace(/\bnope\b/gi, "Nyah");
+      const fallbackText = generateBackupResponse(query, mode, lastError).replace(/\bno\b/gi, "Nyah").replace(/\bnope\b/gi, "Nyah");
       
       const words = fallbackText.split(" ");
       let i = 0;
@@ -434,15 +475,16 @@ app.post("/api/suggest-title", async (req: Request, res: Response): Promise<void
       return;
     }
 
-    const ai = getGeminiClient();
+    let ai = getGeminiClient();
     let response = null;
     let lastError: any = null;
 
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-flash-latest"];
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-flash-lite-latest", "gemini-flash-latest"];
 
     for (const modelName of modelsToTry) {
       for (let attempt = 1; attempt <= 1; attempt++) {
         try {
+          ai = getGeminiClient(); // Rotate key
           console.log(`[Title] Attempt ${attempt} using model: ${modelName}`);
           response = await ai.models.generateContent({
             model: modelName,
