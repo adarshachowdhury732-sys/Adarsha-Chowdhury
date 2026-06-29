@@ -39,7 +39,7 @@ export default function App() {
 
   // Check standalone mode on load
   useEffect(() => {
-    const checkStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+    const checkStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || (window.navigator as any).standalone;
     const isMobileApp = !!checkStandalone;
     setIsStandalone(isMobileApp);
     if (isMobileApp) {
@@ -184,7 +184,7 @@ export default function App() {
       if (savedMode === 'dark' || savedMode === 'light') {
         setThemeMode(savedMode);
       } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const prefersDark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
         setThemeMode(prefersDark ? 'dark' : 'light');
       }
 

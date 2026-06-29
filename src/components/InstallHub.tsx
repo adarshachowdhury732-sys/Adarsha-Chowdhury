@@ -16,7 +16,7 @@ export const InstallHub: React.FC<InstallHubProps> = ({ onBack, sharedUrl }) => 
 
   useEffect(() => {
     // Detect if app is already running in standalone mode (installed)
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+    const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || (window.navigator as any).standalone;
     if (isStandalone) {
       setIsInstalled(true);
     }
