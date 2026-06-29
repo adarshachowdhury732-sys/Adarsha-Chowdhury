@@ -14,7 +14,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
   const parts = content.split(/(```[\s\S]*?```)/g);
 
   return (
-    <div className="prose max-w-full text-slate-700 font-sans">
+    <div className="prose max-w-full text-slate-700 font-sans selectable-text">
       {parts.map((part, index) => {
         if (part.startsWith('```')) {
           // It's a code block

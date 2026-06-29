@@ -39,22 +39,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   return (
     <>
-      {/* Mobile Drawer Overlay */}
-      {isOpen && (
-        <div
-          onClick={onClose}
-          id="mobile-sidebar-overlay"
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-350"
-        />
-      )}
-
       {/* Main Sidebar Panel */}
       <aside
         id="app-sidebar"
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col w-72 bg-white/60 dark:bg-[#010101]/40 backdrop-blur-md border-r border-slate-200/50 dark:border-slate-800/50 transition-transform duration-300 ease-out lg:static lg:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`hidden md:flex flex-col bg-white/60 dark:bg-[#010101]/40 backdrop-blur-md border-r border-slate-200/50 dark:border-slate-800/50 shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${
+          isOpen ? 'w-72 opacity-100' : 'w-0 opacity-0 border-r-0'
         }`}
       >
+        <div className="w-72 flex flex-col h-full">
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-5 py-6 border-b border-slate-200/50 dark:border-slate-800/50">
           <div className="flex items-center gap-3">
@@ -66,7 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={onClose}
             id="close-sidebar-mobile-btn"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden active:scale-95 transition-all"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-200 dark:hover:bg-slate-800 active:scale-95 transition-all md:hidden"
           >
             <X className="w-5 h-5" />
           </button>
@@ -103,7 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }`}
               >
                 <Smartphone className="w-4 h-4" />
-                <span>{viewMode === 'install' ? 'Back to Workspace' : 'Download / Install App'}</span>
+                <span>{viewMode === 'install' ? 'Back to Workspace' : (isStandalone ? 'App Updates' : 'Download / Install App')}</span>
               </button>
 
               <button
@@ -204,6 +196,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
             <span>Active</span>
           </div>
+        </div>
         </div>
       </aside>
     </>

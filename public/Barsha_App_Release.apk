@@ -1,0 +1,2 @@
+This is a placeholder for the compiled APK file.
+When you build your app using Capacitor (e.g. `npx cap build android`), you can drop the generated APK here for users to download directly from the website.

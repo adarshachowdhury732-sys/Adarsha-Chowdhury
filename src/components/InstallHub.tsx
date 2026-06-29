@@ -4,9 +4,10 @@ import { Smartphone, Download, Check, Share, ArrowUpToLine, Shield, Info, Refres
 interface InstallHubProps {
   onBack: () => void;
   sharedUrl: string;
+  isStandalone?: boolean;
 }
 
-export const InstallHub: React.FC<InstallHubProps> = ({ onBack, sharedUrl }) => {
+export const InstallHub: React.FC<InstallHubProps> = ({ onBack, sharedUrl, isStandalone = false }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [activePlatform, setActivePlatform] = useState<'ios' | 'android' | 'desktop'>('android');
@@ -190,6 +191,23 @@ export const InstallHub: React.FC<InstallHubProps> = ({ onBack, sharedUrl }) => 
                     How to Download
                   </button>
                 )}
+              </div>
+            )}
+
+            {/* Android APK Download Option (Capacitor) */}
+            {!isStandalone && (
+              <div className="space-y-4 mb-6">
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                  Looking for the official Android package? You can download the compiled APK file (built via Capacitor) to side-load the full native experience before it hits the Play Store. Live Updates (OTA) are fully supported.
+                </p>
+                <a
+                  href="/Barsha_App_Release.apk"
+                  download
+                  className="w-full flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold text-sm shadow-md transition-all active:scale-97 text-center"
+                >
+                  <Download className="w-4.5 h-4.5" />
+                  Download Android APK
+                </a>
               </div>
             )}
 

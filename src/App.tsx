@@ -6,6 +6,8 @@ import { ChatInput } from './components/ChatInput';
 import { InstallHub } from './components/InstallHub';
 import { OfficialLanding } from './components/OfficialLanding';
 import { ParticlesBackground } from './components/ParticlesBackground';
+import { BottomNav } from './components/BottomNav';
+import { HistoryView } from './components/HistoryView';
 import { ChatSession, Message, Attachment } from './types';
 import { parseBarshaResponse } from './utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -32,7 +34,7 @@ export default function App() {
   const [isStandalone, setIsStandalone] = useState(false);
   
   // --- View modes & update states ---
-  const [viewMode, setViewMode] = useState<'chat' | 'install' | 'landing'>('landing');
+  const [viewMode, setViewMode] = useState<'chat' | 'install' | 'landing' | 'history'>('landing');
   const [swUpdateAvailable, setSwUpdateAvailable] = useState(false);
   const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
@@ -58,7 +60,7 @@ export default function App() {
   };
 
   // --- Mobile visual toggle ---
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
 
   // Service Worker and update listeners
   useEffect(() => {
@@ -516,7 +518,7 @@ export default function App() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className={`flex h-[100dvh] w-[100dvw] overflow-hidden overscroll-none transition-colors duration-300 relative ${themeMode === 'dark' ? 'dark bg-transparent text-slate-100' : 'bg-[#fafcff] text-slate-800'}`}
           >
-            {/* 1. Left Sidebar Navigation */}
+            {/* 1. Left Sidebar Navigation (Desktop Only) */}
           <Sidebar
             sessions={sessions}
             activeSessionId={activeSessionId}
@@ -528,8 +530,8 @@ export default function App() {
             onChangeThemePreset={handleThemeChange}
             themeMode={themeMode}
             onToggleThemeMode={handleToggleThemeMode}
-            isOpen={mobileSidebarOpen}
-            onClose={() => setMobileSidebarOpen(false)}
+            isOpen={desktopSidebarOpen}
+            onClose={() => setDesktopSidebarOpen(false)}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             isStandalone={isStandalone}
@@ -543,10 +545,9 @@ export default function App() {
             }`}>
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => setMobileSidebarOpen(true)}
-                  id="mobile-menu-hamburger-btn"
-                  className="p-2 rounded-xl hover:bg-slate-50 text-slate-500 hover:text-slate-700 active:scale-95 transition-all lg:hidden cursor-pointer"
-                  title="Open menu"
+                  onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
+                  className="p-2 -ml-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 active:scale-95 transition-all cursor-pointer hidden md:block"
+                  title="Toggle menu"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
@@ -559,7 +560,9 @@ export default function App() {
                     <Flower className="w-4 h-4 text-sky-400" />
                   </div>
                   <h1 className="text-base font-bold font-display tracking-tight">
-                    {viewMode === 'install' ? "App Download & Update Hub" : (currentActiveSession ? currentActiveSession.title : "Barsha")}
+                    {viewMode === 'install' ? "App Download & Update Hub" : 
+                     viewMode === 'history' ? "Chat History" :
+                     (currentActiveSession ? currentActiveSession.title : "Barsha")}
                   </h1>
                 </div>
               </div>
@@ -603,10 +606,28 @@ export default function App() {
               </div>
             </header>
 
-            {/* Conditionally Render Chat vs PWA Download Hub */}
+            {/* Conditionally Render Content based on viewMode */}
             {viewMode === 'install' ? (
-              <div className="flex-1 overflow-y-auto bg-[#fafcff] dark:bg-transparent transition-colors duration-300">
-                <InstallHub onBack={() => setViewMode('chat')} sharedUrl={getCleanSharedUrl()} />
+              <div className="flex-1 overflow-y-auto bg-[#fafcff] dark:bg-[#010101] transition-colors duration-300">
+                <InstallHub onBack={() => setViewMode('chat')} sharedUrl={getCleanSharedUrl()} isStandalone={isStandalone} />
+              </div>
+            ) : viewMode === 'history' ? (
+              <div className="flex-1 md:hidden bg-[#fafcff] dark:bg-[#010101] transition-colors duration-300">
+                <HistoryView
+                  sessions={sessions}
+                  activeSessionId={activeSessionId}
+                  onSelectSession={(id) => {
+                    handleSelectSession(id);
+                    setViewMode('chat');
+                  }}
+                  onDeleteSession={handleDeleteSession}
+                  onClearAllChats={handleClearAllChats}
+                  onNewChat={() => {
+                    handleNewChat();
+                    setViewMode('chat');
+                  }}
+                  themeMode={themeMode}
+                />
               </div>
             ) : (
               <>
@@ -633,6 +654,9 @@ export default function App() {
                 </div>
               </>
             )}
+            
+            {/* Native Mobile Bottom Navigation */}
+            <BottomNav viewMode={viewMode} onViewModeChange={setViewMode} themeMode={themeMode} />
           </div>
 
           {/* Service Worker Update Prompt Banner */}
