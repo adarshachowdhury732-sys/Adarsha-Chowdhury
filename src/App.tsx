@@ -70,10 +70,7 @@ export default function App() {
     const isMobileApp = !!isPWA || hasCapacitorObj || isCapacitorUrl;
     
     setIsStandalone(isMobileApp);
-    if (isMobileApp && viewMode === 'landing') {
-      setViewMode('chat');
-    }
-  }, [viewMode]);
+  }, []);
 
   const getCleanSharedUrl = () => {
     let origin = window.location.origin;
@@ -121,10 +118,9 @@ export default function App() {
         }, 120000);
       });
 
-      // Handle reload when new service worker takes over
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        localStorage.setItem('barsha_just_updated', 'true');
-        window.location.reload();
+        // Do not auto-reload to prevent infinite loops in WebViews
+        console.log('Service worker updated');
       });
     }
 
@@ -263,6 +259,10 @@ export default function App() {
   const handleApplyUpdate = () => {
     if (swRegistration && swRegistration.waiting) {
       swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      // Reload manually since we removed auto-reload on controllerchange to prevent webview loops
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } else {
       window.location.reload();
     }
