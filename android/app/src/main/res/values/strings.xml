@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Barsha</string>
+    <string name="title_activity_main">Barsha</string>
+    <string name="package_name">com.barsha.app</string>
+    <string name="custom_url_scheme">com.barsha.app</string>
+</resources>

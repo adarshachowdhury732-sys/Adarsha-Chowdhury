@@ -12,6 +12,16 @@ import { ChatSession, Message, Attachment } from './types';
 import { parseBarshaResponse } from './utils';
 import { motion, AnimatePresence } from 'motion/react';
 
+// Helper to point native Android/Capacitor requests to our live Cloud Run backend URL
+const getApiUrl = (path: string): string => {
+  const isCapacitor = window.location.hostname === 'localhost' && !window.location.port;
+  const isNative = (window as any).Capacitor || isCapacitor;
+  if (isNative) {
+    return `https://ais-pre-wlzyta7a7badsqhx6phtl3-252328339017.asia-southeast1.run.app${path}`;
+  }
+  return path;
+};
+
 export default function App() {
   // --- Splash Screen state ---
   const [showSplash, setShowSplash] = useState(true);
@@ -31,25 +41,39 @@ export default function App() {
   const [themePreset, setThemePreset] = useState<'rose' | 'tulip' | 'dandelion'>('dandelion');
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
   const [appMode, setAppMode] = useState<'study' | 'search' | 'sarcasm'>('study');
-  const [isStandalone, setIsStandalone] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const isCapacitorUrl = window.location.hostname === 'localhost' && !window.location.port;
+    const hasCapacitorObj = !!(window as any).Capacitor;
+    const isPWA = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || (window.navigator as any).standalone;
+    return isPWA || hasCapacitorObj || isCapacitorUrl;
+  });
   
   // --- View modes & update states ---
-  const [viewMode, setViewMode] = useState<'chat' | 'install' | 'landing' | 'history'>('landing');
+  const [viewMode, setViewMode] = useState<'chat' | 'install' | 'landing' | 'history'>(() => {
+    if (typeof window === 'undefined') return 'landing';
+    const isCapacitorUrl = window.location.hostname === 'localhost' && !window.location.port;
+    const hasCapacitorObj = !!(window as any).Capacitor;
+    const isPWA = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || (window.navigator as any).standalone;
+    return (isPWA || hasCapacitorObj || isCapacitorUrl) ? 'chat' : 'landing';
+  });
+  
   const [swUpdateAvailable, setSwUpdateAvailable] = useState(false);
   const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
 
   // Check standalone mode on load
   useEffect(() => {
-    const checkStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || (window.navigator as any).standalone;
-    const isMobileApp = !!checkStandalone;
+    const isCapacitorUrl = window.location.hostname === 'localhost' && !window.location.port;
+    const hasCapacitorObj = !!(window as any).Capacitor;
+    const isPWA = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || (window.navigator as any).standalone;
+    const isMobileApp = !!isPWA || hasCapacitorObj || isCapacitorUrl;
+    
     setIsStandalone(isMobileApp);
-    if (isMobileApp) {
+    if (isMobileApp && viewMode === 'landing') {
       setViewMode('chat');
-    } else {
-      setViewMode('landing');
     }
-  }, []);
+  }, [viewMode]);
 
   const getCleanSharedUrl = () => {
     let origin = window.location.origin;
@@ -323,7 +347,7 @@ export default function App() {
       // Asynchronously suggest a highly elegant, short 3-4 word title for this thread
       if (text) {
         try {
-          const titleRes = await fetch('/api/suggest-title', {
+          const titleRes = await fetch(getApiUrl('/api/suggest-title'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ messageText: text }),
@@ -375,7 +399,7 @@ export default function App() {
 
     try {
       // Send conversational messages history to the API endpoint
-      const response = await fetch('/api/chat', {
+      const response = await fetch(getApiUrl('/api/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
